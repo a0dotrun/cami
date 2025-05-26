@@ -1,11 +1,15 @@
 import restate
 from google.adk.runners import Runner
-from google.adk.sessions import InMemorySessionService
+from google.adk.sessions import DatabaseSessionService
 from google.genai import types
 
 from cami.agents import agent
-from cami.config import APP_NAME
+from cami.config import APP_NAME, TURSO_AUTH_TOKEN, TURSO_DATABASE_URL
 from cami.utils.types import ChatEntry
+
+DB_URL = f"sqlite+{TURSO_DATABASE_URL}/?authToken={TURSO_AUTH_TOKEN}&secure=true"
+
+session_service = DatabaseSessionService(db_url=DB_URL)
 
 chat = restate.VirtualObject("agent")
 
@@ -15,8 +19,6 @@ USER_ID = "sanchitrk"
 @chat.handler("message")
 async def on_message(ctx: restate.ObjectContext, message: ChatEntry):
     session_id = ctx.key()
-    # fixme: use proper memory service
-    session_service = InMemorySessionService()
     await session_service.create_session(
         app_name=APP_NAME,
         user_id=USER_ID,
