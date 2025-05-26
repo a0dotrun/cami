@@ -146,6 +146,11 @@ dev = [
     { name = "ruff" },
 ]
 
+[package.dev-dependencies]
+dev = [
+    { name = "cami" },
+]
+
 [package.metadata]
 requires-dist = [
     { name = "google-adk", specifier = ">=1.0.0" },
@@ -158,6 +163,9 @@ requires-dist = [
     { name = "sqlalchemy-libsql", specifier = ">=0.1.0" },
 ]
 provides-extras = ["dev"]
+
+[package.metadata.requires-dev]
+dev = [{ name = "cami", editable = "." }]
 
 [[package]]
 name = "certifi"

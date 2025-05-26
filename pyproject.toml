@@ -12,7 +12,6 @@ dependencies = [
     "google-adk>=1.0.0",
     "hypercorn>=0.17.3",
     "restate-sdk>=0.7.3",
-    "sqlalchemy-libsql>=0.1.0",
 ]
 
 [project.optional-dependencies]

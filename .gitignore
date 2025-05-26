@@ -16,3 +16,6 @@ restate-data/
 # Env
 env.sh
 .env
+
+# Misc
+adk-python/
