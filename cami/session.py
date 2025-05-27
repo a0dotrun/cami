@@ -2,28 +2,44 @@ import restate
 from google.adk.runners import Runner
 from google.adk.sessions import DatabaseSessionService
 from google.genai import types
+from pydantic import BaseModel
 
 from cami.agents import agent
-from cami.config import APP_NAME, TURSO_AUTH_TOKEN, TURSO_DATABASE_URL
+from cami.config import APP_NAME, DATABASE_PASSWORD, DATABASE_URL
 from cami.utils.types import ChatEntry
 
-DB_URL = f"sqlite+{TURSO_DATABASE_URL}/?authToken={TURSO_AUTH_TOKEN}&secure=true"
 
-session_service = DatabaseSessionService(db_url=DB_URL)
+class Response(BaseModel):
+    status: str
+
+
+session_service = DatabaseSessionService(
+    db_url=f"postgresql://postgres:{DATABASE_PASSWORD}@{DATABASE_URL}/postgres",
+    echo=False,
+)
 
 chat = restate.VirtualObject("agent")
 
+# fixme: should come from auth layer.
 USER_ID = "sanchitrk"
 
 
 @chat.handler("message")
-async def on_message(ctx: restate.ObjectContext, message: ChatEntry):
-    session_id = ctx.key()
-    await session_service.create_session(
+async def on_message(ctx: restate.ObjectContext, message: ChatEntry) -> Response:
+    print(f"-> ctx.key(): {ctx.key()}")
+    print(f"-> role: {message.role} content: {message.content}")
+
+    session = await session_service.get_session(
         app_name=APP_NAME,
         user_id=USER_ID,
-        session_id=session_id,
+        session_id=ctx.key(),
     )
+    if not session:
+        await session_service.create_session(
+            app_name=APP_NAME,
+            user_id=USER_ID,
+            session_id=ctx.key(),
+        )
 
     runner = Runner(
         agent=agent,
@@ -34,8 +50,8 @@ async def on_message(ctx: restate.ObjectContext, message: ChatEntry):
     content = types.Content(role="user", parts=[types.Part(text=message.content)])
     async for event in runner.run_async(
         user_id=USER_ID,
-        session_id=session_id,
         new_message=content,
+        session_id=ctx.key(),
     ):
         print(
             f"Start of Event ---------"
@@ -53,4 +69,5 @@ async def on_message(ctx: restate.ObjectContext, message: ChatEntry):
                 final_reponse_text = "Escalated without message"
             break
     print(f"Agent: {final_reponse_text}")
-    return None
+
+    return Response(status="ok")
