@@ -2,7 +2,7 @@ from typing import Any
 
 import restate
 
-from cami.utils.types import ClaimHistory
+from cami.typedef import ClaimHistory
 
 
 class AskForApproval:

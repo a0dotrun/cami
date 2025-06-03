@@ -3,7 +3,7 @@ import asyncio
 import hypercorn
 import restate
 
-from cami.session import chat
+from cami.run import chat
 
 services: list[restate.Workflow | restate.Service | restate.VirtualObject] = []
 

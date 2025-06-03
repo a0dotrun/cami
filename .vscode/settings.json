@@ -3,6 +3,6 @@
     "**/__pycache__": true,
     "**/*.pyc": true,
     ".venv": true,
-    "restate-data": true,
+    "restate-data": true
   }
 }

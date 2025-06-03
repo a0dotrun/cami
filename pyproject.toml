@@ -9,8 +9,10 @@ description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
+    "google-adk @ file:///Users/sanchitrk/Developer/a0dotrun/hackathon/cami/adk-python",
     "hypercorn>=0.17.3",
     "psycopg2-binary>=2.9.10",
+    "pydantic>=2.11.5",
     "restate-sdk>=0.7.3",
 ]
 
