@@ -1,145 +1,142 @@
-import uuid
+# import uuid
 
-import restate
-from google.adk.events import Event
-from google.adk.runners import Runner
-from google.adk.sessions import DatabaseSessionService
-from google.adk.tools import LongRunningFunctionTool
-from google.genai import types
-from pydantic import BaseModel
+# from google.adk.events import Event
+# from google.adk.runners import Runner
+# from google.adk.sessions import DatabaseSessionService
+# from google.adk.tools import LongRunningFunctionTool
+# from google.genai import types
+# from pydantic import BaseModel
 
-from cami.agent import agent
-from cami.agent.tools.tools import AskForApproval, GetClaimStatus
-from cami.config import APP_NAME, DATABASE_PASSWORD, DATABASE_URL
-from cami.typedef import (
-    ChatEntry,
-    ClaimHistory,
-    LongRunningTask,
-    LongRunningTasks,
-)
-
-
-class Response(BaseModel):
-    status: str
+# from cami.agent import root
+# from cami.agent.tools.tools import AskForApproval, GetClaimStatus
+# from cami.config import APP_NAME, DATABASE_PASSWORD, DATABASE_URL
+# from cami.typedef import (
+#     ChatEntry,
+#     ClaimHistory,
+#     LongRunningTask,
+#     LongRunningTasks,
+# )
 
 
-session_service = DatabaseSessionService(
-    db_url=f"postgresql://postgres:{DATABASE_PASSWORD}@{DATABASE_URL}/postgres",
-    echo=False,
-)
-
-chat = restate.VirtualObject("agent")
-
-# fixme: should come from auth layer.
-USER_ID = "sanchitrk"
+# class Response(BaseModel):
+#     status: str
 
 
-@chat.handler("message")
-async def on_message(ctx: restate.ObjectContext, message: ChatEntry) -> Response:
-    print(f"-> ctx.key(): {ctx.key()}")
-    print(f"-> role: {message.role} content: {message.content}")
+# session_service = DatabaseSessionService(
+#     db_url=f"postgresql://postgres:{DATABASE_PASSWORD}@{DATABASE_URL}/postgres",
+#     echo=False,
+# )
 
-    session = await session_service.get_session(
-        app_name=APP_NAME,
-        user_id=USER_ID,
-        session_id=ctx.key(),
-    )
-    if not session:
-        await session_service.create_session(
-            app_name=APP_NAME,
-            user_id=USER_ID,
-            session_id=ctx.key(),
-        )
 
-    ask_for_approval = AskForApproval(ctx=ctx)
-    get_claim_status = GetClaimStatus(ctx=ctx)
+# # fixme: should come from auth layer.
+# USER_ID = "sanchitrk"
 
-    long_running_tool = LongRunningFunctionTool(func=ask_for_approval)
 
-    agent.tools = [get_claim_status, long_running_tool]
+# async def on_message(ctx: restate.ObjectContext, message: ChatEntry) -> Response:
+#     print(f"-> ctx.key(): {ctx.key()}")
+#     print(f"-> role: {message.role} content: {message.content}")
 
-    runner = Runner(
-        agent=agent,
-        app_name=APP_NAME,
-        session_service=session_service,
-    )
+#     session = await session_service.get_session(
+#         app_name=APP_NAME,
+#         user_id=USER_ID,
+#         session_id=ctx.key(),
+#     )
+#     if not session:
+#         await session_service.create_session(
+#             app_name=APP_NAME,
+#             user_id=USER_ID,
+#             session_id=ctx.key(),
+#         )
 
-    def get_long_running_function_call(event: Event) -> types.FunctionCall | None:
-        if (
-            not event.long_running_tool_ids
-            or not event.content
-            or not event.content.parts
-        ):
-            return
-        for part in event.content.parts:
-            if (
-                part
-                and part.function_call
-                and event.long_running_tool_ids
-                and part.function_call.id in event.long_running_tool_ids
-            ):
-                return part.function_call
+#     ask_for_approval = AskForApproval(ctx=ctx)
+#     get_claim_status = GetClaimStatus(ctx=ctx)
 
-    def get_function_response(
-        event: Event, function_call_id: str
-    ) -> types.FunctionResponse | None:
-        # Get the function response for the fuction call with specified id.
-        if not event.content or not event.content.parts:
-            return
-        for part in event.content.parts:
-            if (
-                part
-                and part.function_response
-                and part.function_response.id == function_call_id
-            ):
-                return part.function_response
+#     long_running_tool = LongRunningFunctionTool(func=ask_for_approval)
 
-    tasks = await ctx.get("tasks", type_hint=LongRunningTasks) or LongRunningTasks()
+#     agent.tools = [get_claim_status, long_running_tool]
 
-    content = types.Content(role="user", parts=[types.Part(text=message.content)])
-    final_reponse_text = None
-    async for event in runner.run_async(
-        user_id=USER_ID,
-        new_message=content,
-        session_id=ctx.key(),
-    ):
-        print(
-            f"Start of Event --------- \n"
-            f"Author: {event.author} \n"
-            f"Type: {type(event).__name__} \n"
-            f"Final: {event.is_final_response()}, Content: {event.content} \n"
-            f"** Event: {event} ** \n"
-            f"End of Event --------- \n"
-        )
-        long_running_function_call = get_long_running_function_call(event)
-        if long_running_function_call:
-            print("**** long running fnc: ", long_running_function_call)
-            task = LongRunningTask(
-                id=long_running_function_call.id or str(uuid.uuid4()),
-                args=long_running_function_call.args,
-                name=long_running_function_call.name,
-            )
-            tasks.entries.append(task)
-            ctx.set("tasks", tasks)
+#     runner = Runner(
+#         agent=agent,
+#         app_name=APP_NAME,
+#         session_service=session_service,
+#     )
 
-        if event.is_final_response():
-            if event.content and event.content.parts:
-                final_reponse_text = event.content.parts[0].text
-            elif event.actions and event.actions.escalate and event.error_message:
-                final_reponse_text = f"Escalated with message: {event.error_message}"
-            elif event.actions and event.actions.escalate:
-                final_reponse_text = "Escalated without message"
-            break
+#     def get_long_running_function_call(event: Event) -> types.FunctionCall | None:
+#         if (
+#             not event.long_running_tool_ids
+#             or not event.content
+#             or not event.content.parts
+#         ):
+#             return
+#         for part in event.content.parts:
+#             if (
+#                 part
+#                 and part.function_call
+#                 and event.long_running_tool_ids
+#                 and part.function_call.id in event.long_running_tool_ids
+#             ):
+#                 return part.function_call
 
-    claims = await ctx.get("claims", type_hint=ClaimHistory) or ClaimHistory()
-    tasks = await ctx.get("tasks", type_hint=LongRunningTasks) or LongRunningTasks()
-    print("----- agent state ----- \n")
-    print("tasks: ", tasks)
-    print("claims: ", claims)
-    print("----- agent state ----- \n")
+#     def get_function_response(
+#         event: Event, function_call_id: str
+#     ) -> types.FunctionResponse | None:
+#         # Get the function response for the fuction call with specified id.
+#         if not event.content or not event.content.parts:
+#             return
+#         for part in event.content.parts:
+#             if (
+#                 part
+#                 and part.function_response
+#                 and part.function_response.id == function_call_id
+#             ):
+#                 return part.function_response
 
-    print(f"Agent: {final_reponse_text}")
-    return Response(status="ok")
+#     tasks = await ctx.get("tasks", type_hint=LongRunningTasks) or LongRunningTasks()
+
+#     content = types.Content(role="user", parts=[types.Part(text=message.content)])
+#     final_reponse_text = None
+#     async for event in runner.run_async(
+#         user_id=USER_ID,
+#         new_message=content,
+#         session_id=ctx.key(),
+#     ):
+#         print(
+#             f"Start of Event --------- \n"
+#             f"Author: {event.author} \n"
+#             f"Type: {type(event).__name__} \n"
+#             f"Final: {event.is_final_response()}, Content: {event.content} \n"
+#             f"** Event: {event} ** \n"
+#             f"End of Event --------- \n"
+#         )
+#         long_running_function_call = get_long_running_function_call(event)
+#         if long_running_function_call:
+#             print("**** long running fnc: ", long_running_function_call)
+#             task = LongRunningTask(
+#                 id=long_running_function_call.id or str(uuid.uuid4()),
+#                 args=long_running_function_call.args,
+#                 name=long_running_function_call.name,
+#             )
+#             tasks.entries.append(task)
+#             ctx.set("tasks", tasks)
+
+#         if event.is_final_response():
+#             if event.content and event.content.parts:
+#                 final_reponse_text = event.content.parts[0].text
+#             elif event.actions and event.actions.escalate and event.error_message:
+#                 final_reponse_text = f"Escalated with message: {event.error_message}"
+#             elif event.actions and event.actions.escalate:
+#                 final_reponse_text = "Escalated without message"
+#             break
+
+#     claims = await ctx.get("claims", type_hint=ClaimHistory) or ClaimHistory()
+#     tasks = await ctx.get("tasks", type_hint=LongRunningTasks) or LongRunningTasks()
+#     print("----- agent state ----- \n")
+#     print("tasks: ", tasks)
+#     print("claims: ", claims)
+#     print("----- agent state ----- \n")
+
+#     print(f"Agent: {final_reponse_text}")
+#     return Response(status="ok")
 
 
 """

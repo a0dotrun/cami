@@ -1,9 +1,5 @@
 from typing import Any
 
-import restate
-
-from cami.typedef import ClaimHistory
-
 
 class AskForApproval:
     """
@@ -22,14 +18,10 @@ class AskForApproval:
 
     name = "ask_for_approval"
 
-    def __init__(
-        self,
-        ctx: restate.ObjectContext,
-    ):
-        self.ctx = ctx
+    def __init__(self):
+        pass
 
     async def __call__(self, amount: float, purpose: str) -> dict[str, Any]:
-        print("-> [In Tool] ctx.key():", self.ctx.key())
         print("-> [In Tool] args:", amount, purpose)
         return {
             "status": "pending",
@@ -54,20 +46,15 @@ class GetClaimStatus:
 
     name = "get_approval_status"
 
-    def __init__(
-        self,
-        ctx: restate.ObjectContext,
-    ):
-        self.ctx = ctx
+    def __init__(self):
+        pass
 
     async def __call__(
         self,
     ) -> dict[str, Any]:
-        claims = await self.ctx.get("claims", type_hint=ClaimHistory) or ClaimHistory()
-
         return {
             "status": "success",
-            "claims": claims,
+            "claims": [],
         }
 
     @property
