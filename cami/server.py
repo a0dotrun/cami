@@ -16,8 +16,8 @@ from pydantic import BaseModel
 from cami.agents.root import agent
 from cami.config import (
     APP_NAME,
-    DATABASE_URL,
 )
+from cami.runs.background import count_words
 
 # --- Basic Configuration --- #
 warnings.filterwarnings("ignore")
@@ -32,8 +32,8 @@ class ThreadMessageRequest(BaseModel):
 
 
 session_service = DatabaseSessionService(
-    db_url=DATABASE_URL,
-    echo=False,
+    db_url="postgresql+psycopg2://postgres:postgres@localhost:5432/postgres",
+    echo=True,
 )
 
 runner = Runner(
@@ -127,3 +127,15 @@ async def thread_messages(thread_id: str, body: ThreadMessageRequest = Body(...)
         status_code=200,
         media_type="text/event-stream",
     )
+
+
+class TestURL(BaseModel):
+    url: str
+
+
+@app.post("/api/v1/test")
+async def test(body: TestURL = Body(...)):
+    logger.info("got test request!!")
+    r = count_words.send(body.url)
+    logger.info(f"sent task: {r}")
+    return 'ok'
