@@ -4,6 +4,8 @@
       <w>asctime</w>
       <w>isready</w>
       <w>levelname</w>
+      <w>llen</w>
+      <w>rpush</w>
       <w>sanchitrk</w>
     </words>
   </dictionary>

@@ -1,6 +1,5 @@
 import asyncio
 import json
-import logging
 import warnings
 from contextlib import asynccontextmanager
 from datetime import datetime, timezone
@@ -46,7 +45,18 @@ runner = Runner(
 async def lifespan(_: FastAPI):
     logger.info("starting up FASTAPI app")
     try:
+        from cami.services import red
+        try:
+            await red.initialize_async()
+            logger.info("redis connection initialized successfully")
+        except Exception as e:
+            logger.error(f"redis initialization failed: {e}", exc_info=True)
+            raise e
         yield
+        try:
+            logger.info("closing redis connection")
+        except Exception as e:
+            logger.error(f"closing redis connection failed: {e}", exc_info=True)
         logger.info("shutting down FASTAPI app")
     except Exception as e:
         logger.error(f"failed to start FASTAPI app:{e}", exc_info=True)
