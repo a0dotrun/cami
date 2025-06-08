@@ -17,12 +17,11 @@ from cami.agents.root import agent
 from cami.config import (
     APP_NAME,
 )
-from cami.runs.background import count_words
+from cami.workers.background import count_words
 
 # --- Basic Configuration --- #
 warnings.filterwarnings("ignore")
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
+from cami.utils.logger import logger
 
 USER_ID = "sanchitrk"
 
