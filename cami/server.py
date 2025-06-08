@@ -5,17 +5,18 @@ from contextlib import asynccontextmanager
 from datetime import datetime, timezone
 from typing import AsyncGenerator
 
-from fastapi import FastAPI, HTTPException, Body
+from fastapi import FastAPI, HTTPException, Body, Response
 from fastapi.responses import StreamingResponse
 from google.adk.runners import Runner
 from google.adk.sessions import DatabaseSessionService
 from google.genai import types
 from pydantic import BaseModel
-
+from cami.workers.background import agent_runner_background
 from cami.agents.root import agent
 from cami.config import (
     APP_NAME,
 )
+from cami.services import red
 from cami.workers.background import count_words
 
 # --- Basic Configuration --- #
@@ -45,7 +46,6 @@ runner = Runner(
 async def lifespan(_: FastAPI):
     logger.info("starting up FASTAPI app")
     try:
-        from cami.services import red
         try:
             await red.initialize_async()
             logger.info("redis connection initialized successfully")
@@ -145,6 +145,17 @@ class TestURL(BaseModel):
 @app.post("/api/v1/test")
 async def test(body: TestURL = Body(...)):
     logger.info("got test request!!")
-    r = count_words.send(body.url)
-    logger.info(f"sent task: {r}")
+    user_id = USER_ID
+    session_id = '1'
+    key = f"agent:run_state:{user_id}:{session_id}"
+
+    curr_agent_run_state = await red.get(key, None)
+    logger.info(f"got agent run state: {curr_agent_run_state}")
+    if curr_agent_run_state:
+        if curr_agent_run_state == 'pending':
+            return Response(status_code=204)
+
+    agent_runner_background.send(APP_NAME, USER_ID, session_id)
+    await red.set(key, 'pending', red.REDIS_KEY_TTL)
+
     return 'ok'
