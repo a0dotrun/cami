@@ -1,4 +1,6 @@
 import asyncio
+import json
+from uuid import uuid4
 
 import dramatiq
 from dramatiq.brokers.rabbitmq import RabbitmqBroker
@@ -34,7 +36,7 @@ broker = RabbitmqBroker(
     middleware=[
         dramatiq.middleware.AsyncIO(),
         initializer_middleware,
-    ]
+    ],
 )
 dramatiq.set_broker(broker)
 
@@ -42,13 +44,27 @@ dramatiq.set_broker(broker)
 @dramatiq.actor
 async def agent_runner_background(app_id: str, user_id: str, session_id: str) -> None:
     logger.info(f"agent runner background {app_id} {user_id} {session_id}")
+    key = f"agent:run_state:{user_id}:{session_id}"
+    response_channel = f"agent:responses:{user_id}:{session_id}"
     try:
-        key = f"agent:run_state:{user_id}:{session_id}"
-        await asyncio.sleep(5)
-        await red.set(key, "resolved", ex=red.REDIS_KEY_TTL)
+        await asyncio.sleep(1)
+        payload = {"id": str(uuid4()), "type": "message", "data": "hello, message 1"}
+        payload_json = json.dumps(payload)
+        await red.publish(response_channel, payload_json)
+
+        await asyncio.sleep(1)
+        payload = {"id": str(uuid4()), "type": "message", "data": "hello, message 2"}
+        payload_json = json.dumps(payload)
+        await red.publish(response_channel, payload_json)
+
+        await asyncio.sleep(1)
+        payload = {"id": str(uuid4()), "type": "message", "data": "hello, message 3"}
+        payload_json = json.dumps(payload)
+        await red.publish(response_channel, payload_json)
+
+        await red.set(key, "idle", ex=red.REDIS_KEY_TTL)
         logger.info(f"agent run completed for {user_id}:{session_id}")
     except Exception as e:
         logger.error(f"Error in agent runner: {e}")
-        error_key = f"agent:run_state:{user_id}:{session_id}"
-        await red.set(error_key, "error", ex=300)
+        await red.set(key, "aborted", ex=300)
         raise

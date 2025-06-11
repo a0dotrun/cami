@@ -1,6 +1,6 @@
 import asyncio
 import os
-from typing import List, Optional, Union, TYPE_CHECKING
+from typing import TYPE_CHECKING
 
 import redis.asyncio as redis
 from dotenv import load_dotenv
@@ -14,7 +14,7 @@ else:
     from redis.asyncio import Redis
 
 # Redis client
-client: Optional[Redis] = None
+client: Redis | None = None
 _initialized: bool = False
 _init_lock: asyncio.Lock = asyncio.Lock()
 
@@ -30,12 +30,12 @@ def initialize() -> Redis:
     load_dotenv()
 
     # Get Redis configuration
-    redis_host = os.getenv('REDIS_HOST', 'redis')
-    redis_port = int(os.getenv('REDIS_PORT', 6379))
-    redis_password = os.getenv('REDIS_PASSWORD', '')
+    redis_host = os.getenv("REDIS_HOST", "redis")
+    redis_port = int(os.getenv("REDIS_PORT", 6379))
+    redis_password = os.getenv("REDIS_PASSWORD", "")
     # Convert string 'True'/'False' to boolean
-    redis_ssl_str = os.getenv('REDIS_SSL', 'False')
-    redis_ssl = redis_ssl_str.lower() == 'true'
+    redis_ssl_str = os.getenv("REDIS_SSL", "False")
+    redis_ssl = redis_ssl_str.lower() == "true"
 
     logger.info(f"Initializing Redis connection to {redis_host}:{redis_port}")
 
@@ -43,13 +43,14 @@ def initialize() -> Redis:
     client = redis.Redis(
         host=redis_host,
         port=redis_port,
+        db=0,
         password=redis_password if redis_password else None,
         ssl=redis_ssl,
         decode_responses=True,
         socket_timeout=5.0,
         socket_connect_timeout=5.0,
         retry_on_timeout=True,
-        health_check_interval=30
+        health_check_interval=30,
     )
 
     return client
@@ -62,7 +63,7 @@ async def initialize_async() -> Redis:
     async with _init_lock:
         if not _initialized:
             logger.info("Initializing Redis connection")
-            await initialize()
+            initialize()
 
             try:
                 await client.ping()
@@ -96,13 +97,15 @@ async def get_client() -> Redis:
 
 
 # Basic Redis operations
-async def set(key: str, value: Union[str, bytes, int, float], ex: Optional[int] = None) -> bool:
+async def set(
+    key: str, value: str | bytes | int | float, ex: None | int = None
+) -> bool:
     """Set a Redis key."""
     redis_client = await get_client()
     return await redis_client.set(key, value, ex=ex)
 
 
-async def get(key: str, default: Optional[str] = None) -> Optional[str]:
+async def get(key: str, default: str | None = None) -> str | None:
     """Get a Redis key."""
     redis_client = await get_client()
     result = await redis_client.get(key)
@@ -128,13 +131,13 @@ async def create_pubsub() -> "PubSub":
 
 
 # List operations
-async def rpush(key: str, *values: Union[str, bytes, int, float]) -> int:
+async def rpush(key: str, *values: str | bytes | int | float) -> int:
     """Append one or more values to a list."""
     redis_client = await get_client()
     return await redis_client.rpush(key, *values)
 
 
-async def lrange(key: str, start: int, end: int) -> List[str]:
+async def lrange(key: str, start: int, end: int) -> list[str]:
     """Get a range of elements from a list."""
     redis_client = await get_client()
     return await redis_client.lrange(key, start, end)
@@ -153,7 +156,7 @@ async def expire(key: str, time: int) -> bool:
     return await redis_client.expire(key, time)
 
 
-async def keys(pattern: str) -> List[str]:
+async def keys(pattern: str) -> list[str]:
     """Get keys matching a pattern."""
     redis_client = await get_client()
     return await redis_client.keys(pattern)
