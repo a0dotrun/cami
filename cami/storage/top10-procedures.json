@@ -1,0 +1,64 @@
+{
+  "common_procedures": [
+    {
+      "procedure_name": "Hemodialysis",
+      "procedure_code": "NEPH_HEMODIAL",
+      "diagnosis_icd10": ["N18.6", "N17.9", "N18.5", "Z99.2"],
+      "ayushman_hbp_code": "1.1.1"
+    },
+    {
+      "procedure_name": "Cataract Surgery",
+      "procedure_code": "OPHTH_CATARACT",
+      "diagnosis_icd10": ["H25.0", "H25.9"],
+      "ayushman_hbp_code": "11.2.2"
+    },
+    {
+      "procedure_name": "Coronary Angioplasty (PTCA)",
+      "procedure_code": "CARD_PTCA",
+      "diagnosis_icd10": ["I20.9", "I21.9", "I25.10"],
+      "ayushman_hbp_code": "8.1.1"
+    },
+    {
+      "procedure_name": "Laparoscopic Appendectomy",
+      "procedure_code": "GEN_LAPAPPEN",
+      "diagnosis_icd10": ["K35.80", "K35.2"],
+      "ayushman_hbp_code": "2.2.3"
+    },
+    {
+      "procedure_name": "Fracture Fixation (Ortho)",
+      "procedure_code": "ORTHO_FXFIX",
+      "diagnosis_icd10": ["S52.5", "S82.1", "S72.0"],
+      "ayushman_hbp_code": "14.3.2"
+    },
+    {
+      "procedure_name": "Cesarean Delivery (C-Section)",
+      "procedure_code": "OBG_CSECTION",
+      "diagnosis_icd10": ["O82", "O75.7", "O66.9"],
+      "ayushman_hbp_code": "9.1.2"
+    },
+    {
+      "procedure_name": "Cholecystectomy (Gallbladder Removal)",
+      "procedure_code": "GEN_CHOLE",
+      "diagnosis_icd10": ["K80.2", "K81.0"],
+      "ayushman_hbp_code": "2.3.4"
+    },
+    {
+      "procedure_name": "TURP (Prostate Surgery)",
+      "procedure_code": "URO_TURP",
+      "diagnosis_icd10": ["N40.0", "R39.1"],
+      "ayushman_hbp_code": "6.2.1"
+    },
+    {
+      "procedure_name": "Chemotherapy Session",
+      "procedure_code": "ONC_CHEMO",
+      "diagnosis_icd10": ["C50.9", "C34.9", "C61"],
+      "ayushman_hbp_code": "10.1.1"
+    },
+    {
+      "procedure_name": "Inguinal Hernia Repair",
+      "procedure_code": "GEN_HERNIA",
+      "diagnosis_icd10": ["K40.2", "K40.9"],
+      "ayushman_hbp_code": "2.4.1"
+    }
+  ]
+}
