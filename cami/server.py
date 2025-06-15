@@ -2,7 +2,7 @@ import asyncio
 import json
 import warnings
 from contextlib import asynccontextmanager
-from datetime import datetime
+from datetime import UTC, datetime
 
 from fastapi import Body, Depends, FastAPI, HTTPException, Request, Response
 from fastapi.responses import StreamingResponse
@@ -57,7 +57,7 @@ async def get_current_user_id():
 def index():
     return {
         "status": "ok",
-        "timestamp": datetime.now(datetime.UTC).isoformat(),
+        "timestamp": datetime.now(UTC).isoformat(),
     }
 
 
@@ -77,7 +77,7 @@ async def get_thread(thread_id: str, user_id: str = Depends(get_current_user_id)
     sess = await service.get_session(
         app_name=APP_NAME, user_id=user_id, session_id=thread_id
     )
-    if not session:
+    if not sess:
         raise HTTPException(status_code=404, detail="Thread not found")
     return {"thread_id": sess.id}
 

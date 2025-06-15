@@ -14,7 +14,7 @@ def initialize() -> DatabaseSessionService:
     logger.info("Initialize DB session service")
     sess = DatabaseSessionService(
         db_url="postgresql+psycopg2://postgres:postgres@localhost:5432/postgres",
-        echo=True,
+        echo=False,
     )
 
     return sess

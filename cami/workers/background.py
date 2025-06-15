@@ -8,7 +8,7 @@ from dramatiq.middleware import Middleware
 from google.adk.runners import Runner
 from google.genai import types
 
-from cami.agents.root import agent
+from cami.agents import root_agent
 from cami.config import APP_NAME
 from cami.infra import red, session
 from cami.utils.logger import logger
@@ -91,7 +91,7 @@ async def agent_runner_background(
     try:
         service = await session.service()
         runner = Runner(
-            agent=agent,
+            agent=root_agent,
             app_name=APP_NAME,
             session_service=service,
         )

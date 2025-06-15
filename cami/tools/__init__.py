@@ -1,5 +1,5 @@
-from .tools import AskForApproval
+import firebase_admin
 
-__all__ = [
-    AskForApproval,
-]
+from cami.config import firebase_credentials
+
+firebase_admin.initialize_app(firebase_credentials)

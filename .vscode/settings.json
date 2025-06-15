@@ -4,5 +4,10 @@
     "**/*.pyc": true,
     ".venv": true,
     "restate-data": true
-  }
+  },
+  "cSpell.words": [
+    "cami",
+    "Firestore",
+    "sess"
+  ]
 }

@@ -1,62 +1,315 @@
-from typing import Any
+"""Module provides tools for the agents"""
+
+import random
+import string
+from datetime import datetime
+from typing import NotRequired, TypedDict
+
+from firebase_admin import firestore_async
+
+from cami.utils import logger
+
+db = db = firestore_async.client()
 
 
-class AskForApproval:
-    """
-    Request approval for a reimbursement from the designated approver.
+# from typing import Any
+
+
+# class AskForApproval:
+#     """
+#     Request approval for a reimbursement from the designated approver.
+
+#     Args:
+#         amount (float): The amount requested.
+#         purpose (str): The reason for the reimbursement.
+
+#     Returns:
+#         A dictionary containing the approval status and metadata:
+#             status (str): The current status (e.g., "pending").
+#             approver (str): The name of the approver handling the request.
+#             message (str): A human-readable message about the request status.
+#     """
+
+#     name = "ask_for_approval"
+
+#     def __init__(self):
+#         pass
+
+#     async def __call__(self, amount: float, purpose: str) -> dict[str, Any]:
+#         print("-> [In Tool] args:", amount, purpose)
+#         return {
+#             "status": "pending",
+#             "approver": "Sean Zhou",
+#             "message": "Your request is being processed. Please wait.",
+#         }
+
+#     @property
+#     def __name__(self):
+#         return self.name
+
+
+# class GetClaimStatus:
+#     """
+#     Returns claim approval status for a reimbursement from the designated approver.
+
+#     Returns:
+#         A dictionary containing the approval status and metadata:
+#             status (str): The current status (e.g., "success").
+#             claims (list): List of claims with keys: purpose, amount, status
+#     """
+
+#     name = "get_approval_status"
+
+#     def __init__(self):
+#         pass
+
+#     async def __call__(
+#         self,
+#     ) -> dict[str, Any]:
+#         return {
+#             "status": "success",
+#             "claims": [],
+#         }
+
+#     @property
+#     def __name__(self):
+#         return self.name
+
+
+class FieldTemplate(TypedDict):
+    value: str
+    required: bool
+    description: str
+    example: NotRequired[str]
+    choices: NotRequired[list[str]]
+
+
+discharge_summary_template: dict[str, FieldTemplate] = {
+    "patient_name": {
+        "value": "[Enter patient's full name]",
+        "required": True,
+        "description": "The patient's full legal name, including first and last name.",
+        "example": "John Doe",
+    },
+    "address": {
+        "value": "[Enter patient's full address]",
+        "required": True,
+        "description": "The patient's complete mailing address.",
+        "example": "123 Main Street, Any town, ST 12345",
+    },
+    "phone_number": {
+        "value": "[Enter phone number]",
+        "required": True,
+        "description": "The patient's primary contact phone number, including the country code. Default country code is IND +91",
+        "example": "+1-555-123-4567",
+    },
+    "date_of_birth": {
+        "value": "[Enter date of birth]",
+        "required": True,
+        "description": "The patient's date of birth in YYYY-MM-DD format.",
+        "example": "1990-06-15",
+    },
+    "gender": {
+        "value": "[Select gender]",
+        "required": True,
+        "description": "The patient's gender.",
+        "choices": ["Male", "Female", "Other", "Prefer not to say"],
+    },
+    "method_of_admission": {
+        "value": "[Select admission method]",
+        "required": True,
+        "description": "The method by which the patient was admitted to the hospital.",
+        "choices": ["Elective", "Emergency", "Transfer", "Newborn", "Other"],
+    },
+    "reason_for_hospitalization": {
+        "value": "[Describe the reason for hospitalization]",
+        "required": True,
+        "description": "A brief description of the primary medical reason, chief complaint, or symptoms leading to hospitalization.",
+        "example": "Patient presented with severe chest pain and shortness of breath.",
+    },
+    "department": {
+        "value": "[Optional: Enter department]",
+        "required": False,
+        "description": "The specific hospital department the patient was admitted to.",
+        "example": "Cardiology",
+    },
+}
+
+
+async def get_discharge_summary_report(patient_id: str) -> dict:
+    """Checks if a patient's discharge summary report is 'completed' or 'pending'.
+
+    This tool takes a patient ID and returns the status of their discharge summary.
+    It does not return the content of the summary itself.
 
     Args:
-        amount (float): The amount requested.
-        purpose (str): The reason for the reimbursement.
+        patient_id (str): The unique identifier for the patient (e.g., "PID-12345").
 
     Returns:
-        A dictionary containing the approval status and metadata:
-            status (str): The current status (e.g., "pending").
-            approver (str): The name of the approver handling the request.
-            message (str): A human-readable message about the request status.
+        dict: A dictionary with two keys:
+              - 'status': The status of the tool call ('success' or 'error').
+              - 'report': The status of the discharge summary ('completed' or 'pending')
+                         OR an error message if the tool call failed.
+
+              - Example (Pending):
+                {"status": "success", "report": "pending"}
+              - Example (Completed):
+                {"status": "success", "report": "completed"}
+              - Example (Error):
+                {"status": "error", "error_message": "Patient ID 'PID-99999' not found."}
     """
+    logger.info(
+        "[Tool Called: get_discharge_summary_report] with args: patient_id='%s'",
+        patient_id,
+    )
 
-    name = "ask_for_approval"
+    return {"status": "success", "report": "pending"}
 
-    def __init__(self):
-        pass
 
-    async def __call__(self, amount: float, purpose: str) -> dict[str, Any]:
-        print("-> [In Tool] args:", amount, purpose)
+async def get_summary_template(patient_id: str) -> dict:
+    """returns the JSON structure of a discharge summary, indicating which fields are required and which have already been filled."""
+    discharge_summary_ref = db.collection("discharge_summaries").document(patient_id)
+    discharge_summary_doc = await discharge_summary_ref.get()
+    if discharge_summary_doc.exists:
+        return {"status": "success", "summary": discharge_summary_doc.to_dict()}
+    else:
         return {
-            "status": "pending",
-            "approver": "Sean Zhou",
-            "message": "Your request is being processed. Please wait.",
+            "status": "error",
+            "error_message": "Discharge summary not found",
         }
 
-    @property
-    def __name__(self):
-        return self.name
 
+async def update_summary_field(
+    patient_id: str, field_key: str, field_value: str
+) -> dict:
+    """Update a field in the discharge summary document for a given patient_id.
 
-class GetClaimStatus:
-    """
-    Returms claim approval status for a reimbursement from the designated approver.
+    Args:
+        patient_id (str): The unique identifier for the patient.
+        field_key (str): The key of the field to update.
+        field_value (str): The value to set for the field.
 
     Returns:
-        A dictionary containing the approval status and metadata:
-            status (str): The current status (e.g., "success").
-            claims (list): List of claims with keys: purpose, amount, status
+        dict: A dictionary containing:
+            - status: 'success' or 'error'
+            - error_message: Present only if status is 'error'
     """
-
-    name = "get_approval_status"
-
-    def __init__(self):
-        pass
-
-    async def __call__(
-        self,
-    ) -> dict[str, Any]:
+    logger.info(
+        f"Updating field {field_key} for patient {patient_id} with value {field_value}"
+    )
+    discharge_summary_ref = db.collection("discharge_summaries").document(patient_id)
+    discharge_summary_doc = await discharge_summary_ref.get()
+    if discharge_summary_doc.exists:
+        document_dict = discharge_summary_doc.to_dict() or {}
+        if field_key is not None and field_key in document_dict:
+            await discharge_summary_ref.update({f"{field_key}.value": field_value})
+            return {"status": "success", "message": "Field updated successfully"}
+        else:
+            return {
+                "status": "error",
+                "error_message": "Field not found",
+            }
+    else:
         return {
-            "status": "success",
-            "claims": [],
+            "status": "error",
+            "error_message": "Discharge summary not found",
         }
 
-    @property
-    def __name__(self):
-        return self.name
+
+async def get_membership(patient_id: str) -> dict:
+    """Check if a patient membership exists in the collection with the given patient_id.
+
+    Args:
+        patient_id (str): The unique identifier for the patient.
+
+    Returns:
+        dict: A dictionary containing:
+            - status: 'success' or 'error'
+            - details: A dictionary containing the patient's details if the user exists, False otherwise
+            - error_message: Present only if status is 'error'
+    """
+    try:
+        user_ref = db.collection("users").document(patient_id)
+        user_doc = await user_ref.get()
+
+        if user_doc.exists:
+            user_data = user_doc.to_dict()
+            if user_data is None:
+                return {"status": "success", "details": None}
+            return {
+                "status": "success",
+                "details": {
+                    "patient_id": patient_id,
+                    "first_name": user_data["first_name"],
+                    "last_name": user_data["last_name"],
+                    "discharge_summary_report": user_data["discharge_summary_report"],
+                },
+            }
+        else:
+            return {"status": "success", "exists": False}
+    except Exception as e:
+        logger.error(f"Error checking membership for patient {patient_id}: {str(e)}")
+        return {
+            "status": "error",
+            "error_message": f"Failed to check membership: {str(e)}",
+        }
+
+
+async def create_membership(
+    first_name: str, last_name: str, phone_number: str, email: str
+) -> dict:
+    """Create a new patient membership with the given information.
+
+    Args:
+        first_name (str): Patient's first name
+        last_name (str): Patient's last name
+        phone_number (str): Patient's phone number
+
+    Returns:
+        dict: A dictionary containing:
+            - status: 'success' or 'error'
+            - patient_id: The generated patient ID (only if status is 'success')
+            - error_message: Present only if status is 'error'
+    """
+
+    logger.info(
+        f"Creating membership for patient {first_name} {last_name} with email {email}"
+    )
+
+    try:
+        # Generate a unique patient ID using timestamp and random string
+        random_str = "".join(
+            random.choices(string.ascii_uppercase + string.digits, k=8)
+        )
+        patient_id = f"PID-{random_str}"
+
+        # Create the user document
+        user_ref = db.collection("users").document(patient_id)
+
+        # Prepare user data
+        user_data = {
+            "phone_number": phone_number,
+            "email": email,
+            "first_name": first_name,
+            "last_name": last_name,
+            "created_at": datetime.utcnow(),
+            "updated_at": datetime.utcnow(),
+            "discharge_summary_report": "pending",
+        }
+        await user_ref.set(user_data)
+
+        # Seed data for new member
+        # create a discharge summary document for the new member
+        discharge_summary_ref = db.collection("discharge_summaries").document(
+            patient_id
+        )
+        discharge_summary_ref.set(discharge_summary_template)
+
+        return {"status": "success", "patient_id": patient_id}
+
+    except Exception as e:
+        logger.error(f"Error creating membership: {str(e)}")
+        return {
+            "status": "error",
+            "error_message": f"Failed to create membership: {str(e)}",
+        }

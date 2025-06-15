@@ -11,6 +11,7 @@ requires-python = ">=3.13"
 dependencies = [
     "dramatiq[rabbitmq,watch]>=1.18.0",
     "fastapi>=0.115.12",
+    "firebase-admin>=6.9.0",
     "google-adk @ file:///Users/sanchitrk/Developer/a0dotrun/hackathon/cami/adk-python",
     "hypercorn>=0.17.3",
     "psycopg2-binary>=2.9.10",
@@ -35,18 +36,23 @@ cami = "cami.server:app"
 target-version = "py313"
 line-length = 100
 select = [
-    "E",  # pycodestyle errors
-    "W",  # pycodestyle warnings
-    "F",  # pyflakes
-    "I",  # isort
-    "B",  # flake8-bugbear
-    "C4", # flake8-comprehensions
-    "UP", # pyupgrade
+    "E",   # pycodestyle errors
+    "W",   # pycodestyle warnings
+    "F",   # pyflakes
+    "I",   # isort
+    "B",   # flake8-bugbear
+    "C4",  # flake8-comprehensions
+    "UP",  # pyupgrade
+    "N",   # pep8-naming
+    "D",   # pydocstyle
+    "RUF", # ruff-specific rules
 ]
 ignore = [
     "E501",  # line too long, handled by black
     "B008",  # do not perform function calls in argument defaults
     "C901",  # complexity
+    "D100",  # Missing docstring in public module
+    "D104",  # Missing docstring in public package
 ]
 
 # Exclude a variety of commonly ignored directories.
@@ -75,6 +81,10 @@ exclude = [
 [tool.ruff.format]
 quote-style = "double"
 indent-style = "space"
+docstring-code-format = true
+docstring-code-line-length = 100
+line-ending = "auto"
+skip-magic-trailing-comma = false
 
 [tool.hatch.metadata]
 allow-direct-references = true
