@@ -1,8 +1,8 @@
-import asyncio
 import json
 from uuid import uuid4
 
 import dramatiq
+from dramatiq import actor
 from dramatiq.brokers.rabbitmq import RabbitmqBroker
 from dramatiq.middleware import Middleware
 from google.adk.runners import Runner
@@ -15,8 +15,10 @@ from cami.utils.logger import logger
 
 
 class WorkerInitializerMiddleware(Middleware):
+    """Dramatiq middleware, use this for init."""
+
     def after_worker_boot(self, broker, worker):
-        global session_service
+        """Do work after worker boot, we are setting up some db and cache here."""
         try:
             logger.info("initializing redis connection")
             red.initialize()
@@ -29,7 +31,7 @@ class WorkerInitializerMiddleware(Middleware):
         """Called before processing each message to ensure Redis is connected."""
         # This ensures Redis is initialized for each message processing
         # We'll handle Redis initialization in each actor as needed
-        pass
+        return None
 
 
 # Create middleware instance
@@ -47,39 +49,9 @@ broker = RabbitmqBroker(
 dramatiq.set_broker(broker)
 
 
-@dramatiq.actor
-async def test_runner_background(app_id: str, user_id: str, session_id: str) -> None:
-    logger.info(f"agent runner background {app_id} {user_id} {session_id}")
-    key = f"agent:run_state:{user_id}:{session_id}"
-    response_channel = f"agent:responses:{user_id}:{session_id}"
-    try:
-        await asyncio.sleep(1)
-        payload = {"id": str(uuid4()), "type": "message", "data": "hello, message 1"}
-        payload_json = json.dumps(payload)
-        await red.publish(response_channel, payload_json)
-
-        await asyncio.sleep(1)
-        payload = {"id": str(uuid4()), "type": "message", "data": "hello, message 2"}
-        payload_json = json.dumps(payload)
-        await red.publish(response_channel, payload_json)
-
-        await asyncio.sleep(1)
-        payload = {"id": str(uuid4()), "type": "message", "data": "hello, message 3"}
-        payload_json = json.dumps(payload)
-        await red.publish(response_channel, payload_json)
-
-        await red.set(key, "idle", ex=red.REDIS_KEY_TTL)
-        logger.info(f"agent run completed for {user_id}:{session_id}")
-    except Exception as e:
-        logger.error(f"Error in agent runner: {e}")
-        await red.set(key, "aborted", ex=300)
-        raise
-
-
-@dramatiq.actor
-async def agent_runner_background(
-    app_name: str, user_id: str, session_id: str, message: str
-):
+@actor
+async def agent_runner_background(app_name: str, user_id: str, session_id: str, message: str):
+    """Main entry point for agent runner."""
     logger.info(
         f"agent runner background started for app_name={app_name} user_id={user_id} session_id={session_id}"
     )
@@ -114,11 +86,7 @@ async def agent_runner_background(
                 full_response_text += event.content.parts[0].text
 
             if event.is_final_response():
-                if (
-                    event.content
-                    and event.content.parts
-                    and event.content.parts[0].text
-                ):
+                if event.content and event.content.parts and event.content.parts[0].text:
                     final_text = full_response_text + (
                         event.content.parts[0].text if not event.partial else ""
                     )
@@ -137,10 +105,7 @@ async def agent_runner_background(
                 ):
                     response_data = event.get_function_responses()[0].response
                     print(f"Display raw tool result: {response_data}")
-                elif (
-                    hasattr(event, "long_running_tool_ids")
-                    and event.long_running_tool_ids
-                ):
+                elif hasattr(event, "long_running_tool_ids") and event.long_running_tool_ids:
                     print("Display message: Tool is running in background...")
             else:
                 # Handle other types of final responses if applicable

@@ -13,6 +13,4 @@ DATABASE_PASSWORD = os.environ.get("DATABASE_PASSWORD")
 USER_ID = os.environ.get("USER_ID", "octopus")
 
 
-firebase_credentials = credentials.Certificate(
-    os.environ.get("GOOGLE_FIREBASE_CREDENTIALS_PATH")
-)
+firebase_credentials = credentials.Certificate(os.environ.get("GOOGLE_FIREBASE_CREDENTIALS_PATH"))

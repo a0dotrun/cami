@@ -1,21 +1,19 @@
 import logging
 import sys
-from typing import Optional
 
 
 def setup_logger(
-        name: str = "cami",
-        level: str = "INFO",
-        format_string: Optional[str] = None,
+    name: str = "cami",
+    level: str = "INFO",
+    format_string: None | str = None,
 ) -> logging.Logger:
-    """
-    Setup and configure logger for the application.
-    
+    """Setup and configure logger for the application.
+
     Args:
         name: Logger name
         level: Logging level (DEBUG, INFO, WARNING, ERROR, CRITICAL)
         format_string: Custom format string for log messages
-    
+
     Returns:
         Configured logger instance
     """

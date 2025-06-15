@@ -83,6 +83,11 @@ dev = [
     { name = "ruff" },
 ]
 
+[package.dev-dependencies]
+dev = [
+    { name = "ruff" },
+]
+
 [package.metadata]
 requires-dist = [
     { name = "dramatiq", extras = ["rabbitmq", "watch"], specifier = ">=1.18.0" },
@@ -101,6 +106,9 @@ requires-dist = [
     { name = "uvicorn", specifier = ">=0.34.3" },
 ]
 provides-extras = ["dev"]
+
+[package.metadata.requires-dev]
+dev = [{ name = "ruff", specifier = ">=0.11.11" }]
 
 [[package]]
 name = "certifi"

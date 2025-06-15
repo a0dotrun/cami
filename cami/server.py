@@ -20,11 +20,14 @@ warnings.filterwarnings("ignore")
 
 
 class ThreadMessageRequest(BaseModel):
+    """Represents prompt message from user."""
+
     message: str
 
 
 @asynccontextmanager
 async def lifespan(_: FastAPI):
+    """FastAPI lifespan coroutine. Use this for setup and destroy."""
     logger.info("starting up FASTAPI app")
     try:
         try:
@@ -55,6 +58,7 @@ async def get_current_user_id():
 
 @app.get("/")
 def index():
+    """Index route."""
     return {
         "status": "ok",
         "timestamp": datetime.now(UTC).isoformat(),
@@ -63,6 +67,7 @@ def index():
 
 @app.post("/api/v1/threads")
 async def create_thread(user_id: str = Depends(get_current_user_id)):
+    """Route to create thread aka session in Google's ADK definition."""
     service = await session.service()
     sess = await service.create_session(
         app_name=APP_NAME,
@@ -73,10 +78,9 @@ async def create_thread(user_id: str = Depends(get_current_user_id)):
 
 @app.get("/api/v1/threads/{thread_id}")
 async def get_thread(thread_id: str, user_id: str = Depends(get_current_user_id)):
+    """Route to fetch thread for given thread id, aka Google's ADK session."""
     service = await session.service()
-    sess = await service.get_session(
-        app_name=APP_NAME, user_id=user_id, session_id=thread_id
-    )
+    sess = await service.get_session(app_name=APP_NAME, user_id=user_id, session_id=thread_id)
     if not sess:
         raise HTTPException(status_code=404, detail="Thread not found")
     return {"thread_id": sess.id}
@@ -88,9 +92,7 @@ async def stream_responses(
     thread_id: str,
     user_id: str = Depends(get_current_user_id),
 ):
-    """
-    Streams agent responses for a given thread using Redis Pub/Sub and Server-Sent Events (SSE).
-    """
+    """Streams agent responses for a given thread using Redis Pub/Sub and Server-Sent Events (SSE)."""
     response_channel = f"agent:responses:{user_id}:{thread_id}"
 
     async def response_stream_generator():
@@ -106,9 +108,7 @@ async def stream_responses(
                 print("message:", message)
                 # Check if client has disconnected
                 if await request.is_disconnected():
-                    logger.warning(
-                        f"Client disconnected from stream for thread {thread_id}."
-                    )
+                    logger.warning(f"Client disconnected from stream for thread {thread_id}.")
                     break
 
                 # 3. Process valid messages, ignoring subscribe confirmations
@@ -123,9 +123,7 @@ async def stream_responses(
                     yield f"data: {data}\n\n"
 
         except asyncio.CancelledError:
-            logger.info(
-                f"Stream cancelled for thread {thread_id}. Client likely disconnected."
-            )
+            logger.info(f"Stream cancelled for thread {thread_id}. Client likely disconnected.")
         except Exception as e:
             logger.error(f"Error in stream for thread {thread_id}: {e}", exc_info=True)
             error_payload = json.dumps(
@@ -156,6 +154,7 @@ async def run_thread(
     user_id: str = Depends(get_current_user_id),
     body: ThreadMessageRequest = Body(...),
 ):
+    """Agent entry point to run to send user query."""
     logger.info(f"received request for user_id: {USER_ID}, session_id: {thread_id}")
     logger.info(f"message: {body.message}")
     run_state_key = f"agent:run_state:{user_id}:{thread_id}"
@@ -183,8 +182,6 @@ async def run_thread(
         await red.set(run_state_key, "running", red.REDIS_KEY_TTL)
     except Exception as e:
         logger.error(f"error getting or creating session: {e}", exc_info=True)
-        raise HTTPException(
-            status_code=500, detail="error getting or creating session"
-        ) from e
+        raise HTTPException(status_code=500, detail="error getting or creating session") from e
 
     return Response(status_code=204)
