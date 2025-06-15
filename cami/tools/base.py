@@ -164,10 +164,10 @@ async def get_discharge_summary_report(patient_id: str) -> dict:
             summary is being retrieved.
 
     Returns:
-        dict: A dictionary containing:
-            - status: 'success' or 'error'
-            - error_message: Present only if status is 'error'
-            - if status `success` contains the `report` key with discharge summary details.
+        dict: A dictionary containing keys:
+            - status: 'success' or 'error'.
+            - error_message: present only if error occurred.
+            - report: if successful with discharge summary details.
     """
     discharge_summary_ref = db.collection("discharge_summaries").document(patient_id)
     discharge_summary_doc = await discharge_summary_ref.get()
@@ -189,9 +189,10 @@ async def update_discharge_summary_field(patient_id: str, field_key: str, field_
         field_value (str): The value to set for the field.
 
     Returns:
-        dict: A dictionary containing:
-            - status: 'success' or 'error'
-            - error_message: Present only if status is 'error'
+        dict: A dictionary containing keys:
+            - status: 'success' or 'error'.
+            - error_message: present only if error occurred.
+            - message: if successful with update status of the operation.
     """
     logger.info(f"Updating field {field_key} for patient {patient_id} with value {field_value}")
     discharge_summary_ref = db.collection("discharge_summaries").document(patient_id)
@@ -220,10 +221,10 @@ async def get_membership(patient_id: str) -> dict:
         patient_id (str): The unique identifier for the patient.
 
     Returns:
-        dict: A dictionary containing:
-            - status: 'success' or 'error'
-            - If 'status' is 'success' details: A dictionary containing the patient's details if the user exists.
-            - error_message: Present only if status is 'error'
+        dict: A dictionary containing keys:
+            - status: 'success' or 'error'.
+            - error_message: present only if error occurred.
+            - detail: if successful with user details.
     """
     try:
         user_ref = db.collection("users").document(patient_id)
@@ -235,14 +236,14 @@ async def get_membership(patient_id: str) -> dict:
                 return {"status": "error", "error_message": "Membership does not exists"}
             return {
                 "status": "success",
-                "details": {
+                "detail": {
                     "patient_id": patient_id,
                     "first_name": user_data["first_name"],
                     "last_name": user_data["last_name"],
                 },
             }
         else:
-            return {"status": "success", "exists": False}
+            return {"status": "error", "error_message": "User does not exists."}
     except Exception as e:
         logger.error(f"Error checking membership for patient {patient_id}: {e!s}")
         return {
@@ -261,10 +262,10 @@ async def create_membership(first_name: str, last_name: str, phone_number: str, 
         email (str): Patient's email address
 
     Returns:
-        dict: A dictionary containing:
-            - status: 'success' or 'error'
-            - patient_id: The generated patient ID (only if status is 'success')
-            - error_message: Present only if status is 'error'
+        dict: A dictionary containing keys:
+            - status: 'success' or 'error'.
+            - error_message: present only if error occurred.
+            - message: if successful with create status of the operation.
     """
     logger.info(f"Creating membership for patient {first_name} {last_name} with email {email}")
 
@@ -275,7 +276,7 @@ async def create_membership(first_name: str, last_name: str, phone_number: str, 
         # Create the user document
         user_ref = db.collection("users").document(patient_id)
 
-        # Prepare user data
+        # Prepare user data with other properties
         user_data = {
             "phone_number": phone_number,
             "email": email,
@@ -288,11 +289,11 @@ async def create_membership(first_name: str, last_name: str, phone_number: str, 
         await user_ref.set(user_data)
 
         # Seed data for new member
-        # create a discharge summary document for the new member
+        # create a discharge summary document for the newly member
         discharge_summary_ref = db.collection("discharge_summaries").document(patient_id)
-        discharge_summary_ref.set(discharge_summary_template)
+        await discharge_summary_ref.set(discharge_summary_template)
 
-        return {"status": "success", "patient_id": patient_id}
+        return {"status": "success", "message": f"member created with patient id: {patient_id}"}
 
     except Exception as e:
         logger.error(f"Error creating membership: {e!s}")
@@ -309,10 +310,10 @@ async def discharge_summary_status(patient_id: str) -> dict:
         patient_id (str): The unique identifier for the patient.
 
     Returns:
-        dict: A dictionary containing:
-            - status: 'success' or 'error'
-            - error_message: Present only if status is 'error'
-            - if status `success` contains the `detail` key with either 'completed' or 'pending' status of discharge summary.
+        dict: A dictionary containing keys:
+            - status: 'success' or 'error'.
+            - error_message: present only if error occurred.
+            - detail: if successful with discharge summary status 'pending' or 'completed'
     """
     try:
         user_ref = db.collection("users").document(patient_id)
@@ -330,4 +331,39 @@ async def discharge_summary_status(patient_id: str) -> dict:
         return {
             "status": "error",
             "error_message": "Error when checking for discharge summary status",
+        }
+
+
+async def update_discharge_summary_status(patient_id: str, status: str) -> dict:
+    """Update patient's discharge summary status for the given patient_id.
+
+    Args:
+        patient_id (str): The unique identifier for the patient.
+        status (str): The status of the discharge summary either 'completed' or 'pending'
+
+    Returns:
+        dict: A dictionary containing keys:
+            - status: 'success' or 'error'.
+            - error_message: present only if error occurred.
+            - message: if successful with update status of the operation.
+    """
+    try:
+        user_ref = db.collection("users").document(patient_id)
+        user_doc = await user_ref.get()
+
+        if not user_doc.exists:
+            return {"status": "error", "error_message": "Patient does not exist."}
+
+        # Update the discharge_summary_report field
+        await user_ref.update({"discharge_summary_report": status})
+
+        return {
+            "status": "success",
+            "message": f"Successfully updated discharge summary status to {status}",
+        }
+    except Exception as e:
+        logger.error(f"Error updating discharge summary status for patient {patient_id}: {e!s}")
+        return {
+            "status": "error",
+            "error_message": "Error when updating discharge summary status",
         }

@@ -2,23 +2,22 @@ from google.adk.agents import Agent
 
 from cami.config import MODEL_GEMINI_2_0_FLASH
 from cami.prompts.base import (
-    DISCHARGE_SUMMARY_AGENT,
+    DISCHARGE_SUMMARY_INSTRUCTION,
     MEMBERSHIP_INSTRUCTION,
     ROOT_INSTRUCTION,
 )
 from cami.tools.base import (
     create_membership,
+    discharge_summary_status,
     get_discharge_summary_report,
     get_membership,
-    get_discharge_summary_report,
     update_discharge_summary_field,
-    discharge_summary_status,
 )
 
 discharge_summary_agent = Agent(
     name="discharge_summary_agent",
     model=MODEL_GEMINI_2_0_FLASH,
-    instruction=DISCHARGE_SUMMARY_AGENT,
+    instruction=DISCHARGE_SUMMARY_INSTRUCTION,
     tools=[get_discharge_summary_report, update_discharge_summary_field],
 )
 
