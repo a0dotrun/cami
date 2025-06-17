@@ -16,7 +16,7 @@ Steps:
 - Documents for verification:
 	<Discharge Summary Report>
 	- Use tool `get_discharge_summary_report` to lookup patients discharge summary report and notify the results in human friendly format.
-	- If report is `pending` call `discharge_summary_agent`
+	- If report is `pending` call `discharge_agent`
 	- Transfer to main agent
 	</Discharge Summary Report>
 
