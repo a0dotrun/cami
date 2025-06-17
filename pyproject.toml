@@ -9,11 +9,16 @@ description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
+    "dramatiq[rabbitmq,watch]>=1.18.0",
+    "fastapi>=0.115.12",
+    "firebase-admin>=6.9.0",
     "google-adk @ file:///Users/sanchitrk/Developer/a0dotrun/hackathon/cami/adk-python",
     "hypercorn>=0.17.3",
     "psycopg2-binary>=2.9.10",
     "pydantic>=2.11.5",
-    "restate-sdk>=0.7.3",
+    "python-dotenv>=1.0.0",
+    "redis>=6.2.0",
+    "uvicorn>=0.34.3",
 ]
 
 [project.optional-dependencies]
@@ -25,36 +30,86 @@ dev = [
 ]
 
 [project.scripts]
-cami = "cami.main:main"
+cami = "cami.server:app"
 
 [tool.ruff]
 target-version = "py313"
-line-length = 88
+line-length = 100
+
+[tool.ruff.lint]
 select = [
-    "E",  # pycodestyle errors
-    "W",  # pycodestyle warnings
-    "F",  # pyflakes
-    "I",  # isort
-    "B",  # flake8-bugbear
-    "C4", # flake8-comprehensions
-    "UP", # pyupgrade
+    "E",    # pycodestyle errors
+    "W",    # pycodestyle warnings
+    "F",    # pyflakes
+    "I",    # isort
+    "B",    # flake8-bugbear
+    "C4",   # flake8-comprehensions
+    "UP",   # pyupgrade
+    "N",    # pep8-naming
+    "D",    # pydocstyle
+    "RUF",  # ruff-specific rules
+    "S",    # flake8-bandit (security)
+    "PTH",  # flake8-use-pathlib
+    "PL",   # pylint
+    "PIE",  # flake8-pie
+    "SIM",  # flake8-simplify
 ]
-ignore = []
+ignore = [
+    "E501",   # line too long, handled by formatter
+    "B008",   # do not perform function calls in argument defaults
+    "C901",   # too complex
+    "D100",   # Missing docstring in public module
+    "D104",   # Missing docstring in public package
+    "D203",   # one-blank-line-before-class (conflicts with D211)
+    "D213",   # multi-line-summary-second-line (conflicts with D212)
+    "PLR0913", # too many arguments
+    "PLR0915", # too many statements
+    "S101",   # use of assert
+]
+
+# Exclude a variety of commonly ignored directories.
+exclude = [
+    ".bzr",
+    ".direnv",
+    ".eggs",
+    ".git",
+    ".hg",
+    ".mypy_cache",
+    ".nox",
+    ".pants.d",
+    ".ruff_cache",
+    ".svn",
+    ".tox",
+    ".venv",
+    "__pypackages__",
+    "_build",
+    "buck-out",
+    "build",
+    "dist",
+    "node_modules",
+    "venv",
+]
 
 [tool.ruff.format]
 quote-style = "double"
 indent-style = "space"
+docstring-code-format = true
+docstring-code-line-length = 100
+line-ending = "auto"
+skip-magic-trailing-comma = false
 
-[tool.mypy]
-python_version = "3.13"
-warn_return_any = true
-warn_unused_configs = true
-disallow_untyped_defs = true
+[tool.ruff.lint.isort]
+known-first-party = ["cami"]
+force-single-line = false
+split-on-trailing-comma = true
 
-[tool.pytest.ini_options]
-testpaths = ["tests"]
-python_files = ["test_*.py"]
-addopts = "--cov=cami --cov-report=term-missing"
+[tool.ruff.lint.pydocstyle]
+convention = "google"
 
 [tool.hatch.metadata]
 allow-direct-references = true
+
+[dependency-groups]
+dev = [
+    "ruff>=0.11.11",
+]

@@ -21,3 +21,6 @@ env.sh
 # Misc
 adk-python/
 adk-python.tar
+
+firebase.json
+log.txt

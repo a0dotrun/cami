@@ -4,5 +4,15 @@
     "**/*.pyc": true,
     ".venv": true,
     "restate-data": true
-  }
+  },
+  "cSpell.words": [
+    "cami",
+    "Dramatiq",
+    "Firestore",
+    "genai",
+    "Pydantic",
+    "Pytest",
+    "Rabbitmq",
+    "sess"
+  ]
 }
