@@ -13,7 +13,7 @@ dependencies = [
     "dramatiq[rabbitmq,watch]>=1.18.0",
     "fastapi>=0.115.12",
     "firebase-admin>=6.9.0",
-    "google-adk @ file:///Users/sanchitrk/Developer/a0dotrun/hackathon/cami/adk-python",
+    "google-adk>=1.4.1",
     "httpx>=0.25.0",
     "hypercorn>=0.17.3",
     "psycopg2-binary>=2.9.10",
