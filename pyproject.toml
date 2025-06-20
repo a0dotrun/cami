@@ -61,6 +61,8 @@ ignore = [
     "B008",   # do not perform function calls in argument defaults
     "C901",   # too complex
     "D100",   # Missing docstring in public module
+    "D103", 
+    "D101", 
     "D104",   # Missing docstring in public package
     "D203",   # one-blank-line-before-class (conflicts with D211)
     "D213",   # multi-line-summary-second-line (conflicts with D212)
