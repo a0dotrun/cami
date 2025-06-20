@@ -35,6 +35,8 @@ def policy_agent_instructions(context: ReadonlyContext) -> str:
     1. Make sure Patient ID is available. Otherwise notify the user and collect the Patient ID.
     2. Check for existing policy for the Patient, Notify the patient of existing policy details.
     3. If there is no existing policy, ask the patient if they want to purchase a new policy. Display list of available policies.
+
+    If the customer asks anything else, transfer back to the triage agent.
     """
 
 
