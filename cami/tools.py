@@ -3,9 +3,14 @@ from datetime import UTC, datetime
 
 import firebase_admin
 from firebase_admin import firestore_async
+from google.adk.agents import Agent
+from google.adk.agents.readonly_context import ReadonlyContext
+from google.adk.tools import ToolContext
+from google.adk.tools.agent_tool import AgentTool
 from pydantic import BaseModel
 
-from cami.config import firebase_credentials
+from cami.config import MODEL_GEMINI_2_0_FLASH, firebase_credentials
+from cami.storage.policies import get_doc_from_policy
 from cami.utils.logger import logger
 
 firebase_admin.initialize_app(firebase_credentials)
@@ -107,7 +112,7 @@ class PolicyPlan(BaseModel):
 
 def policies_in_db() -> list[PolicyPlan]:
     policies = [
-        PolicyPlan(name="Star Health Super Star", policy_id="SHS1234", sum_insured=100000),
+        PolicyPlan(name="Star Health Pro", policy_id="SHS1234", sum_insured=100000),
         PolicyPlan(name="Star Health Lite", policy_id="SHL7760", sum_insured=20000),
     ]
     return policies
@@ -497,3 +502,52 @@ async def check_existing_policy(patient_id: str) -> dict:
             "status": "error",
             "error_message": "Error checking existing policy. Please try again.",
         }
+
+
+def policy_faq_instructions(context: ReadonlyContext) -> str:
+    policy_id = context.state.get("temp:policy_id", "")
+    document = get_doc_from_policy(policy_id)
+
+    return f"""You are an FAQ agent speaking to a customer.
+    <PolicyDocument>
+        {document}
+    </PolicyDocument>
+
+    Use the following routine to support the customer.
+    1. Respond to the customer with the answer based on Policy document.
+    2. If you do not know the answer, politely inform the customer that you do not have the information.
+    3. Do not make up your own answers and Do not provide any information that is not in the document.
+    """
+
+
+policy_faq_agent = Agent(
+    name="policy_faq_agent",
+    model=MODEL_GEMINI_2_0_FLASH,
+    instruction=policy_faq_instructions,
+    tools=[],
+)
+
+
+async def policy_faqs(policy_id: str, query: str, tool_context: ToolContext) -> dict:
+    """Lookup answers to Frequency Asked Questions (FAQs) for a Policy.
+
+    Args:
+        policy_id (str): Policy ID
+        query (str): The question or query about the policy.
+
+    Returns:
+        dict: A dictionary containing keys:
+            - status: 'success' or 'error'.
+            - error_message: present only if error occurred.
+            - result: if successful with the answer to the query.
+    """
+    tool_context.state["temp:policy_id"] = policy_id
+    agent_tool = AgentTool(agent=policy_faq_agent)
+    result = await agent_tool.run_async(
+        args={"request": query},
+        tool_context=tool_context,
+    )
+    return {
+        "status": "success",
+        "result": result,
+    }

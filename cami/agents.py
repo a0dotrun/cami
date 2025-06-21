@@ -16,6 +16,7 @@ from cami.tools import (
     check_existing_policy,
     check_membership,
     create_membership,
+    policy_faqs,
     purchase_policy,
 )
 
@@ -35,6 +36,7 @@ def policy_agent_instructions(context: ReadonlyContext) -> str:
     1. Make sure Patient ID is available. Otherwise notify the user and collect the Patient ID.
     2. Check for existing policy for the Patient, Notify the patient of existing policy details.
     3. If there is no existing policy, ask the patient if they want to purchase a new policy. Display list of available policies.
+    4. If the customer wants ask questions related to a policy, use policy faq tool to answer the questions.
 
     If the customer asks anything else, transfer back to the triage agent.
     """
@@ -45,7 +47,12 @@ policy_agent = Agent(
     model=MODEL_GEMINI_2_0_FLASH,
     instruction=policy_agent_instructions,
     description="A helpful agent that can help with insurance policy, purchase, listing and policy faqs.",
-    tools=[available_policies, purchase_policy, check_existing_policy],
+    tools=[
+        available_policies,
+        purchase_policy,
+        check_existing_policy,
+        policy_faqs,
+    ],
 )
 
 
@@ -81,7 +88,7 @@ def on_after_membership_tool(
     return None
 
 
-root_agent = Agent(
+triage_agent = Agent(
     name="triage_agent",
     model=MODEL_GEMINI_2_0_FLASH,
     instruction=TRIAGE_INSTRUCTION,
