@@ -7,14 +7,14 @@ This document outlines common claim-level sublimits used in health insurance cla
 ## 1. Room Rent
 - **Type:** `daily_limit`
 - **Limit:** `₹3,000`
-- **Description:** Maximum allowable per day for standard room rent. If exceeded, proportionate deduction applies on associated costs (doctor, surgery, etc.).
+- **Description:** Maximum allowable per day for standard room rent.
 
 ---
 
 ## 2. ICU Rent
 - **Type:** `daily_limit`
 - **Limit:** `₹5,000`
-- **Description:** Cap on ICU room rent per day. Charges above this are either excluded or proportionately deducted.
+- **Description:** Cap on ICU room rent per day.
 
 ---
 
@@ -101,12 +101,5 @@ This document outlines common claim-level sublimits used in health insurance cla
 - **Type:** `non_payable`
 - **Payable:** `false`
 - **Description:** Charges for food for companions or unprescribed meals are excluded.
-
----
-
-## 15. Hospital Cash Benefit *(Optional Rider)*
-- **Type:** `fixed_daily_benefit`
-- **Limit:** `₹1,000/day`
-- **Description:** Fixed daily payout if rider is active; not linked to actual expenses.
 
 ---

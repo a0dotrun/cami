@@ -1,9 +1,9 @@
 STAR_HEALTH_LITE = """
-# 🌟 Star Health Lite - Detailed Procedure Coverage (with % of Coverage)
+# Star Health Lite - Detailed Procedure Coverage (with % of Coverage)
 
 ## **1. Dengue Fever Treatment** - ₹50,000
 
-| Sub-Treatment                        | % of Coverage |
+| Sub-Treatment                       | % of Coverage  |
 |-------------------------------------|----------------|
 | Hospitalization                     | 60%            |
 | Platelet monitoring & transfusion   | 20%            |
@@ -14,7 +14,7 @@ STAR_HEALTH_LITE = """
 
 ## **2. Typhoid Treatment** - ₹40,000
 
-| Sub-Treatment                        | % of Coverage |
+| Sub-Treatment                       | % of Coverage  |
 |-------------------------------------|----------------|
 | Hospitalization & observation       | 60%            |
 | Antibiotic therapy                  | 20%            |
@@ -25,7 +25,7 @@ STAR_HEALTH_LITE = """
 
 ## **3. Appendicitis Surgery** - ₹1,00,000
 
-| Sub-Treatment                        | % of Coverage |
+| Sub-Treatment                       | % of Coverage  |
 |-------------------------------------|----------------|
 | Laparoscopic appendectomy           | 70%            |
 | Open surgery (if needed)            | 80%            |
@@ -36,7 +36,7 @@ STAR_HEALTH_LITE = """
 
 ## **4. Fracture Treatment** - ₹75,000
 
-| Sub-Treatment                        | % of Coverage |
+| Sub-Treatment                       | % of Coverage  |
 |-------------------------------------|----------------|
 | X-rays & diagnosis                  | 5%             |
 | Plaster or cast                     | 15%            |
@@ -47,7 +47,7 @@ STAR_HEALTH_LITE = """
 
 ## **5. Gallbladder Surgery** - ₹90,000
 
-| Sub-Treatment                        | % of Coverage |
+| Sub-Treatment                       | % of Coverage  |
 |-------------------------------------|----------------|
 | Laparoscopic cholecystectomy        | 70%            |
 | Ultrasound & liver function tests   | 10%            |
@@ -58,7 +58,7 @@ STAR_HEALTH_LITE = """
 
 ## **6. Pneumonia Hospitalization** - ₹60,000
 
-| Sub-Treatment                        | % of Coverage |
+| Sub-Treatment                       | % of Coverage  |
 |-------------------------------------|----------------|
 | Chest X-ray, CRP, CBC tests         | 10%            |
 | IV antibiotics & nebulization       | 40%            |
@@ -69,7 +69,7 @@ STAR_HEALTH_LITE = """
 
 ## **7. Diabetes Complication Care** - ₹70,000
 
-| Sub-Treatment                        | % of Coverage |
+| Sub-Treatment                       | % of Coverage  |
 |-------------------------------------|----------------|
 | ICU for DKA or hypoglycemia         | 40%            |
 | Insulin therapy & IV fluids         | 30%            |
@@ -80,7 +80,7 @@ STAR_HEALTH_LITE = """
 
 ## **8. Heart Attack Stabilization** - ₹1,50,000
 
-| Sub-Treatment                        | % of Coverage |
+| Sub-Treatment                       | % of Coverage  |
 |-------------------------------------|----------------|
 | ECG, Troponin, Echo tests           | 10%            |
 | Emergency angiography               | 30%            |
@@ -91,7 +91,7 @@ STAR_HEALTH_LITE = """
 
 ## **9. Kidney Stone Removal** - ₹80,000
 
-| Sub-Treatment                        | % of Coverage |
+| Sub-Treatment                       | % of Coverage  |
 |-------------------------------------|----------------|
 | Ultrasound/CT scan                  | 10%            |
 | Lithotripsy (non-invasive)          | 40%            |
@@ -102,7 +102,7 @@ STAR_HEALTH_LITE = """
 
 ## **10. COVID-19 Treatment** - ₹1,00,000
 
-| Sub-Treatment                        | % of Coverage |
+| Sub-Treatment                       | % of Coverage  |
 |-------------------------------------|----------------|
 | RT-PCR and blood panels             | 10%            |
 | Hospital bed, oxygen & IV support   | 40%            |
@@ -118,7 +118,7 @@ STAR_HEALTH_PRO = """
 
 ## **1. Cancer Treatment (All Stages)** - ₹5,00,000
 
-| Sub-Treatment                        | % of Coverage |
+| Sub-Treatment                       | % of Coverage  |
 |-------------------------------------|----------------|
 | Chemotherapy sessions               | 30%            |
 | Radiation therapy (IMRT, IGRT)      | 15%            |
@@ -131,7 +131,7 @@ STAR_HEALTH_PRO = """
 
 ## **2. Cardiac Surgery (CABG, Valve)** - ₹4,00,000
 
-| Sub-Treatment                        | % of Coverage |
+| Sub-Treatment                       | % of Coverage  |
 |-------------------------------------|----------------|
 | Coronary Artery Bypass Graft (CABG) | 62.5%          |
 | Valve replacement surgery           | 50%            |
@@ -143,7 +143,7 @@ STAR_HEALTH_PRO = """
 
 ## **3. Chronic Kidney Disease Dialysis** - ₹3,00,000
 
-| Sub-Treatment                        | % of Coverage |
+| Sub-Treatment                       | % of Coverage  |
 |-------------------------------------|----------------|
 | Hemodialysis sessions               | 40%            |
 | Dialyzer and consumables            | 10%            |
@@ -156,11 +156,11 @@ STAR_HEALTH_PRO = """
 
 ## **4. Liver Cirrhosis Management** - ₹2,50,000
 
-| Sub-Treatment                        | % of Coverage |
+| Sub-Treatment                       | % of Coverage  |
 |-------------------------------------|----------------|
 | Liver function tests (LFTs)         | 2%             |
 | Albumin infusions                   | 5%             |
-| Endoscopy for varices              | 10%            |
+| Endoscopy for varices               | 10%            |
 | Ascitic tapping                     | 5%             |
 | ICU for hepatic encephalopathy      | 30%            |
 | Liver biopsy or FibroScan           | 10%            |
@@ -169,7 +169,7 @@ STAR_HEALTH_PRO = """
 
 ## **5. Orthopedic Surgeries** - ₹2,00,000
 
-| Sub-Treatment                        | % of Coverage |
+| Sub-Treatment                       | % of Coverage  |
 |-------------------------------------|----------------|
 | Total knee replacement              | 75%            |
 | Hip replacement                     | 90%            |
@@ -181,7 +181,7 @@ STAR_HEALTH_PRO = """
 
 ## **6. Neurological Disorders Care** - ₹2,50,000
 
-| Sub-Treatment                        | % of Coverage |
+| Sub-Treatment                       | % of Coverage  |
 |-------------------------------------|----------------|
 | Stroke management & thrombolysis    | 40%            |
 | EEG / NCV studies                   | 2%             |
@@ -193,7 +193,7 @@ STAR_HEALTH_PRO = """
 
 ## **7. Maternity & Newborn Care** - ₹1,50,000
 
-| Sub-Treatment                        | % of Coverage |
+| Sub-Treatment                       | % of Coverage  |
 |-------------------------------------|----------------|
 | Normal delivery                     | 33%            |
 | Cesarean section                    | 67%            |
@@ -205,7 +205,7 @@ STAR_HEALTH_PRO = """
 
 ## **8. Mental Health In-patient Care** - ₹1,00,000
 
-| Sub-Treatment                        | % of Coverage |
+| Sub-Treatment                       | % of Coverage  |
 |-------------------------------------|----------------|
 | Psychiatric hospitalization         | 50%            |
 | Clinical psychology sessions        | 15%            |
@@ -216,7 +216,7 @@ STAR_HEALTH_PRO = """
 
 ## **9. Diabetes & Hypertension Package** - ₹1,50,000
 
-| Sub-Treatment                        | % of Coverage |
+| Sub-Treatment                       | % of Coverage  |
 |-------------------------------------|----------------|
 | Blood sugar/BP tests                | 2%             |
 | ECG and monitoring                  | 1%             |
@@ -228,7 +228,7 @@ STAR_HEALTH_PRO = """
 
 ## **10. Accident & Trauma Care** - ₹3,00,000
 
-| Sub-Treatment                        | % of Coverage |
+| Sub-Treatment                       | % of Coverage  |
 |-------------------------------------|----------------|
 | Emergency stabilization             | 5%             |
 | CT/MRI scans                        | 10%            |
