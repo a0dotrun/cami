@@ -551,3 +551,27 @@ async def policy_faqs(policy_id: str, query: str, tool_context: ToolContext) -> 
         "status": "success",
         "result": result,
     }
+
+
+def check_ongoing_claim(patient_id: str) -> dict:
+    """Check if there is an ongoing claim for the patient.
+
+    Args:
+        patient_id (str): Patient's ID
+
+    Returns:
+        dict: A dictionary containing keys:
+            - status: 'success' or 'error'.
+            - error_message: present only if error occurred.
+            - result: if successful with ongoing claim details.
+    """
+    logger.info(f"Checking ongoing claim for patient {patient_id}")
+    result = """
+    Claim ID: CLM-1111\n
+    Claim Status: Ongoing\n
+    Discharge Summary Report: Pending\n
+    """
+    return {
+        "status": "success",
+        "result": result,
+    }

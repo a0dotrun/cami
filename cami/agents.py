@@ -1,45 +1,33 @@
 from typing import Any
 
 from google.adk.agents import Agent
-from google.adk.agents.readonly_context import ReadonlyContext
 from google.adk.tools.base_tool import BaseTool
 from google.adk.tools.tool_context import ToolContext
 from pydantic import BaseModel
 
 from cami.config import MODEL_GEMINI_2_0_FLASH
 from cami.prompts import (
-    DISCHARGE_INSTRUCTION,
     TRIAGE_INSTRUCTION,
+    claim_agent_instructions,
+    policy_agent_instructions,
 )
 from cami.tools import (
     available_policies,
     check_existing_policy,
     check_membership,
+    check_ongoing_claim,
     create_membership,
     policy_faqs,
     purchase_policy,
 )
 
-discharge_agent = Agent(
-    name="discharge_agent",
+claim_agent = Agent(
+    name="claim_agent",
+    description="A helpful agent that can help customer with insurance claims, ongoing claims and new claims.",
     model=MODEL_GEMINI_2_0_FLASH,
-    instruction=DISCHARGE_INSTRUCTION,
-    tools=[],
+    instruction=claim_agent_instructions,
+    tools=[check_ongoing_claim],
 )
-
-
-def policy_agent_instructions(context: ReadonlyContext) -> str:
-    patient_id = context.state.get("user:patient_id", "")
-    return f"""You are a Insurance Policy Agent. If you are speaking to a customer, you probably were transferred to from the triage agent.
-    Your customer Patient ID is: {patient_id}.
-    Use the following routine to support the patient.
-    1. Make sure Patient ID is available. Otherwise notify the user and collect the Patient ID.
-    2. Check for existing policy for the Patient, Notify the patient of existing policy details.
-    3. If there is no existing policy, ask the patient if they want to purchase a new policy. Display list of available policies.
-    4. If the customer wants ask questions related to a policy, use policy faq tool to answer the questions.
-
-    If the customer asks anything else, transfer back to the triage agent.
-    """
 
 
 policy_agent = Agent(
@@ -93,7 +81,7 @@ triage_agent = Agent(
     model=MODEL_GEMINI_2_0_FLASH,
     instruction=TRIAGE_INSTRUCTION,
     description="Main customer service and triaging agent.",
-    sub_agents=[policy_agent],
+    sub_agents=[policy_agent, claim_agent],
     tools=[check_membership, create_membership],
     after_tool_callback=on_after_membership_tool,
 )
