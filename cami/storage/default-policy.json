@@ -1,14 +1,17 @@
 {
   "policy_id": "SHAHLIP25036V012425",
   "policy_name": "Star Health Super Star",
-  "sum_insured": null,
   "coverage_type": [
     "Individual",
     "Family Floater"
   ],
   "pre_hospitalization": {
     "covered": true,
-    "duration_days": 90
+    "duration_days": 90,
+    "daily_limit": {
+      "psi": 1,
+      "cap": 5000
+    }
   },
   "post_hospitalization": {
     "covered": true,
@@ -26,64 +29,51 @@
     {
       "procedure": "AYUSH Inpatient",
       "procedure_code": "AYUSH_INP",
-      "co_pay": 0.0,
-      "requires_pre_auth": false,
-      "network_only": true,
+      "co_pay": {
+        "existing_condition": 30
+      },
       "sub_limits": null
     },
     {
       "procedure": "Inpatient/Hospitalization",
       "procedure_code": "INP_HOSP",
       "co_pay": 0.0,
-      "requires_pre_auth": true,
-      "network_only": false,
       "sub_limits": null
     },
     {
       "procedure": "Day Care Procedures",
       "procedure_code": "DAYCARE",
       "co_pay": 0.0,
-      "requires_pre_auth": true,
-      "network_only": false,
       "sub_limits": null
     },
     {
       "procedure": "Dialysis",
       "procedure_code": "NEPH_DIALYSIS",
       "co_pay": 0.0,
-      "requires_pre_auth": false,
-      "network_only": false,
       "sub_limits": null
     },
     {
       "procedure": "Organ Donor Surgery",
       "procedure_code": "ORGAN_DONOR",
       "co_pay": 0.0,
-      "requires_pre_auth": true,
-      "network_only": false,
       "sub_limits": null
     },
     {
       "procedure": "Home Care Treatment",
       "procedure_code": "HOME_CARE",
       "co_pay": 0.0,
-      "requires_pre_auth": false,
-      "network_only": false,
       "sub_limits": null
     },
     {
       "procedure": "Chemotherapy / Radiotherapy",
       "procedure_code": "ONC_TX",
       "co_pay": 0.0,
-      "requires_pre_auth": false,
-      "network_only": false,
       "sub_limits": null
     },
     {
       "procedure": "Robotic Surgeries",
       "procedure_code": "PROC_ROBO_SURG",
       "category": "Modern Treatment",
-      "requires_pre_auth": true,
       "covered_under": "Inpatient",
       "icd_codes": [
         "C61",
