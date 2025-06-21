@@ -3,7 +3,7 @@ import json
 
 class DefaultPolicy:
     def __init__(self):
-        self.json_path = "./rule_engine/policies/default.json"
+        self.json_path = "./storage/default-policy.json"
         self.covered_procedures = []
         self._load_policy()
 

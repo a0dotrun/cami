@@ -1,0 +1,602 @@
+[
+  {
+    "id": 1,
+    "name": "Apollo Hospital (Bannerghatta Road)",
+    "address": "154/11, Bannerghatta Road, Opposite IIM-B",
+    "location": "Bangalore, 560076"
+  },
+  {
+    "id": 2,
+    "name": "Manipal Hospital (Old Airport Road)",
+    "address": "98, HAL Old Airport Road, Kodihalli",
+    "location": "Bangalore, 560017"
+  },
+  {
+    "id": 3,
+    "name": "Fortis Hospital (Bannerghatta Road)",
+    "address": "154/9, Bannerghatta Road, Opposite IIM-B",
+    "location": "Bangalore, 560076"
+  },
+  {
+    "id": 4,
+    "name": "Aster CMI Hospital",
+    "address": "43/2, New Airport Road, NH-7, Sahakara Nagar, Hebbal",
+    "location": "Bangalore, 560092"
+  },
+  {
+    "id": 5,
+    "name": "Sakra World Hospital",
+    "address": "Outer Ring Road, Marathahalli",
+    "location": "Bangalore, 560103"
+  },
+  {
+    "id": 6,
+    "name": "BGS Gleneagles Global Hospitals",
+    "address": "67, Uttarahalli Main Road, Kengeri",
+    "location": "Bangalore, 560060"
+  },
+  {
+    "id": 7,
+    "name": "Narayana Institute of Cardiac Sciences",
+    "address": "No. 258/A, Bommasandra Industrial Area, Anekal Taluk, Hosur Road",
+    "location": "Bangalore, 560099"
+  },
+  {
+    "id": 8,
+    "name": "HCG Cancer Hospital (K.R. Road)",
+    "address": "#8, P. Kalinga Rao Road, Sampangi Ram Nagar",
+    "location": "Bangalore, 560027"
+  },
+  {
+    "id": 9,
+    "name": "Columbia Asia Hospital (Whitefield)",
+    "address": "Sy.No.10P & 12P, Ramagondanahalli Village, Varthur Hobli, Whitefield",
+    "location": "Bangalore, 560066"
+  },
+  {
+    "id": 10,
+    "name": "St. John's Medical College Hospital",
+    "address": "Sarjapur Road",
+    "location": "Bangalore, 560034"
+  },
+  {
+    "id": 11,
+    "name": "Victoria Hospital",
+    "address": "K.R. Road, Fort",
+    "location": "Bangalore, 560002"
+  },
+  {
+    "id": 12,
+    "name": "Bowring and Lady Curzon Hospital",
+    "address": "Lady Curzon Road, Shivaji Nagar, Tasker Town",
+    "location": "Bangalore, 560001"
+  },
+  {
+    "id": 13,
+    "name": "NIMHANS (National Institute of Mental Health and Neurosciences)",
+    "address": "Hosur Road, Lakkasandra",
+    "location": "Bangalore, 560029"
+  },
+  {
+    "id": 14,
+    "name": "Jayadeva Institute of Cardiovascular Sciences and Research",
+    "address": "Bannerghatta Road, Jayanagar 9th Block",
+    "location": "Bangalore, 560069"
+  },
+  {
+    "id": 15,
+    "name": "M.S. Ramaiah Memorial Hospital",
+    "address": "New B E L Road, M S Ramaiah Nagar, MSRIT Post, Mathikere",
+    "location": "Bangalore, 560054"
+  },
+  {
+    "id": 16,
+    "name": "Sparsh Hospital (Yeshwanthpur)",
+    "address": "4/1, Tumkur Road, Yeshwanthpur",
+    "location": "Bangalore, 560022"
+  },
+  {
+    "id": 17,
+    "name": "Rainbow Children's Hospital",
+    "address": "No. 16, SY NO. 33, 34 Ambalipura Village, Varthur Hobli, Sarjapur Road",
+    "location": "Bangalore, 560103"
+  },
+  {
+    "id": 18,
+    "name": "Cloudnine Hospital (Jayanagar)",
+    "address": "1533, 9th Main, 3rd Block, Jayanagar",
+    "location": "Bangalore, 560011"
+  },
+  {
+    "id": 19,
+    "name": "Motherhood Hospital (Indiranagar)",
+    "address": "324, 9th Main, 5th Block, HMT Layout, Vidyaranyapura",
+    "location": "Bangalore, 560097"
+  },
+  {
+    "id": 20,
+    "name": "Kidwai Memorial Institute of Oncology",
+    "address": "Dr. M.H. Marigowda Road, Hosur Road",
+    "location": "Bangalore, 560029"
+  },
+  {
+    "id": 21,
+    "name": "Hosmat Hospital",
+    "address": "No. 45, Magrath Road, Off. Richmond Road",
+    "location": "Bangalore, 560025"
+  },
+  {
+    "id": 22,
+    "name": "Chinmaya Mission Hospital",
+    "address": "NO.11, CMH ROAD, OPP DEENABANDHU TEMPLE INDIRANAGAR",
+    "location": "BANGALORE, 560038"
+  },
+  {
+    "id": 23,
+    "name": "Mallige Medical Centre Pvt Ltd",
+    "address": "No.31/32, Crescent Road, Near Shivananda Circle",
+    "location": "Bangalore, 560001"
+  },
+  {
+    "id": 24,
+    "name": "Mallya Hospital",
+    "address": "No.2, Vittal Mallya Road, Ashok Nagar",
+    "location": "Bangalore, 560001"
+  },
+  {
+    "id": 25,
+    "name": "Bangalore Baptist Hospital",
+    "address": "Bellary Road, Hebbal",
+    "location": "Bengaluru, 560024"
+  },
+  {
+    "id": 26,
+    "name": "K.C. General Hospital",
+    "address": "#89, 5th Cross, Near Malleswaram Police Station, Malleswaram",
+    "location": "Bangalore, 560003"
+  },
+  {
+    "id": 27,
+    "name": "ESI Hospital (Rajajinagar)",
+    "address": "8/3, E Block, I Block, I Stage, Rajajinagar",
+    "location": "Bengaluru, 560010"
+  },
+  {
+    "id": 28,
+    "name": "Vani Vilas Hospital",
+    "address": "K.R. Road, Fort",
+    "location": "Bengaluru, 560002"
+  },
+  {
+    "id": 29,
+    "name": "Indira Gandhi Institute of Child Health",
+    "address": "South Hospital Complex, Dharmaram College Post",
+    "location": "Bengaluru, 560029"
+  },
+  {
+    "id": 30,
+    "name": "Sagar Hospitals (Jayanagar)",
+    "address": "4th T Block, Opposite Sagar Hotel, Jayanagar",
+    "location": "Bengaluru, 560027"
+  },
+  {
+    "id": 31,
+    "name": "Aster RV Hospital",
+    "address": "CA 37, 24th Main, JP Nagar 7th Phase",
+    "location": "Bangalore, 560078"
+  },
+  {
+    "id": 32,
+    "name": "Astra Superspeciality Hospital",
+    "address": "Main Road Konanakunte Cross",
+    "location": "Bangalore, 560062"
+  },
+  {
+    "id": 33,
+    "name": "Medicover Hospitals",
+    "address": "No. 351, Sy.No: 1203B, 1231,2,3 Hoodi Village",
+    "location": "BANGALORE, 560048"
+  },
+  {
+    "id": 34,
+    "name": "EKANA HOSPITALS",
+    "address": "110, BEGUR VILLAGE, BEGUR-KOPPA MAIN ROAD",
+    "location": "BANGALORE, 560068"
+  },
+  {
+    "id": 35,
+    "name": "CURA HOSPITALS",
+    "address": "18, Doddakallasandra Industrial Area, Kanakapura Main Road, Venkatareddy Layout, Uttarahalli Hobli",
+    "location": "BANGALORE, 560062"
+  },
+  {
+    "id": 36,
+    "name": "HEALING EARTH MULTI SPECIALITY AYURVEDA HOSPITAL",
+    "address": "149, HSR Ring Road, 5TH SECTOR, HSR LAYOUT",
+    "location": "BANGALORE, 560034"
+  },
+  {
+    "id": 37,
+    "name": "Apollo Cradle and Childrens Hospital (Koramangala)",
+    "address": "255 , 1st Main Road , E Block Subramanya Nagar, 2nd Stage, Rajajinagar",
+    "location": "BANGALORE, 560010"
+  },
+  {
+    "id": 38,
+    "name": "Jayadev Memorial Rashtrotthana Hospital and Research Centre",
+    "address": "No 3990/396/36/3900 Halagevaderahalli Village BEML 5th Stage, R R Nagar",
+    "location": "BANGALORE, 560098"
+  },
+  {
+    "id": 39,
+    "name": "SURGECARE SUPER SPECIALITY HOSPITAL",
+    "address": "NO.1 and 2, 5TH CROSS,DYANAND LAYOUT,RAMAMURTHY NAGAR",
+    "location": "BANGALORE, 560016"
+  },
+  {
+    "id": 40,
+    "name": "IBBANI NETHRALAYA",
+    "address": "No 34, Mchs Layout, Jakkur Main Road",
+    "location": "BANGALORE, 560064"
+  },
+  {
+    "id": 41,
+    "name": "Devi SuperSpeciality Eye Hospital",
+    "address": "No.185, Varthur Main Road, Opp. Thubarahalli Bus Stop, Varthur Hobli, Whitefield",
+    "location": "BANGALORE, 560066"
+  },
+  {
+    "id": 42,
+    "name": "VYDEHI SUPERSPECIALITY HOSPITAL",
+    "address": "No.2, Vittal Mallya Road, Opposite Kanteerva Stadium",
+    "location": "BANGALORE, 560001"
+  },
+  {
+    "id": 43,
+    "name": "SAI SPARSH HOSPITALS",
+    "address": "No.408, Hosur Road, Garvebhavipalya, Begur Hobli",
+    "location": "BANGALORE, 560068"
+  },
+  {
+    "id": 44,
+    "name": "SURESH HOSPITAL AND MATERNITY HOME",
+    "address": "124, Hegganahalli Main Road, 1St Stage Sanjeevini Nagar, Opp Mohan Theatre",
+    "location": "BANGALORE, 560091"
+  },
+  {
+    "id": 45,
+    "name": "BRAINS SUPER SPECIALITY HOSPITAL",
+    "address": "192, T. MARIYAPPA ROAD, LALBAGH, SIDDAPURA, JAYANAGARA 1 ST BLOCK",
+    "location": "BANGALORE, 560011"
+  },
+  {
+    "id": 46,
+    "name": "LEELAVATTI MULTI SPECIALITY HOSPITAAL PVT LTD",
+    "address": "No.7, 2nd main Road, Chamarajpet",
+    "location": "Bangalore, 560018"
+  },
+  {
+    "id": 47,
+    "name": "CANS MULTI SPECIALITY HOSPITAL",
+    "address": "2, Gbm And Sons Layout, Byrappa Gardens, Ramachandrapura",
+    "location": "BANGALORE, 560013"
+  },
+  {
+    "id": 48,
+    "name": "NOBLE MULTISPECIALITY HOSPITALS",
+    "address": "87, Noble Residency Road, Doddakamanahalli Main Road, Central Excise Layout B G Road",
+    "location": "BANGALORE, 560068"
+  },
+  {
+    "id": 49,
+    "name": "A V EYE HOSPITAL AND DIAGNOSTICS PVT LTD",
+    "address": "No.711, Modi Hospital Road, Woc Road, 2Nd Stage, Mahalakshipuram",
+    "location": "BANGALORE, 560086"
+  },
+  {
+    "id": 50,
+    "name": "COFT HOSPITALS LLP",
+    "address": "No.8, Sampige Road, Malleswaram",
+    "location": "BANGALORE, 560003"
+  },
+  {
+    "id": 51,
+    "name": "SUVITAS HOLISTIC HEALTHCARE PRIVATE LIMITED",
+    "address": "286-287 Sri Sai Sadan, Intermediate Ring Rd, Amarjyoti Layout, Domlur",
+    "location": "BANGALORE, 560071"
+  },
+  {
+    "id": 52,
+    "name": "SPANDANA HEART AND SUPER SPECIALITY HOSPITAL",
+    "address": "239/206/24A Sarjapura Main Road",
+    "location": "BANGALORE, 562125"
+  },
+  {
+    "id": 53,
+    "name": "DIVYA JYOTI NETRALAYA",
+    "address": "No.3, Market Road, Sajjan Rao Circle, Opp. V.B.Bakery, V.V.Puram",
+    "location": "BANGALORE, 560004"
+  },
+  {
+    "id": 54,
+    "name": "SRIRAM NETHRALAYA",
+    "address": "No.2, 1St Floor, Opposite Ganesha Temple, Near Old Police Station, K.R.Puram",
+    "location": "BANGALORE, 560036"
+  },
+  {
+    "id": 55,
+    "name": "KAVERI HEALTHCARE",
+    "address": "Sm Tower, 261, 2nd Phase, 2nd Stage, 3rd Cross, Domlur",
+    "location": "BANGALORE, 560071"
+  },
+  {
+    "id": 56,
+    "name": "S.S.G Hospital",
+    "address": "171, 2Nd Main, Kempegowda Nagar, Magadi Main Road",
+    "location": "BANGALORE, 560091"
+  },
+  {
+    "id": 57,
+    "name": "SWASTIK HOSPITAL",
+    "address": "No 761 Dommasandra Circle Sarjapura To Bangalore Main Road Anekal Tq",
+    "location": "BANGALORE, 562125"
+  },
+  {
+    "id": 58,
+    "name": "GEETHA HOSPITAL",
+    "address": "Old Madras Road Avalahalli Virgonagar, Near Cipla Factory",
+    "location": "BANGALORE, 560049"
+  },
+  {
+    "id": 59,
+    "name": "Kalppa Virusha Hospital Pvt Ltd",
+    "address": "780/11 , Rg Arcade , Sarjapur Road, Attibele",
+    "location": "BANGALORE, 562107"
+  },
+  {
+    "id": 60,
+    "name": "VIVIDUS HEALTH PVT LTD",
+    "address": "33, MATTEKERE MAIN ROAD, Gokala 1st stage",
+    "location": "BANGALORE, 560054"
+  },
+  {
+    "id": 61,
+    "name": "Portea Home Health Care",
+    "address": "No. 69-B, 1st Cross, 1st Stage, Domlur Layout",
+    "location": "Bangalore, 560071"
+  },
+  {
+    "id": 62,
+    "name": "Apoorva Hospital and Diagnostic Centre",
+    "address": "548/1, Cmh Road, Stage 1, Indiranagar Metro Station",
+    "location": "BANGALORE, 560038"
+  },
+  {
+    "id": 63,
+    "name": "NEW VARALAKSHMI HOSPITAL",
+    "address": "No 2 (Old No 2944) 2nd Stage Rajajinagar Mahakavi Kuvempu Road",
+    "location": "BANGALORE, 560010"
+  },
+  {
+    "id": 64,
+    "name": "B W LIONS SHRI VIDYASAGAR OSWAL INSTITUTE OF OPHTHALMOLOGY",
+    "address": "C A Site No.2, 9Th Cross, Rbi Layout, J.P Nagar 7Th Phase, Kothanur",
+    "location": "BANGALORE, 560078"
+  },
+  {
+    "id": 65,
+    "name": "TRUST-IN HOSPITAL NMPC PRIVATE LTD",
+    "address": "No 121 M V Appa Complex, Main Rd Horamavu",
+    "location": "BANGALORE, 560043"
+  },
+  {
+    "id": 66,
+    "name": "ASTER WOMEN AND CHILDREN HOPSITAL",
+    "address": "Plot No. 2, Survey No - 76, Sadaramangala Industrial Area, Opp Itpl Main Rd, Whitefield",
+    "location": "BANGALORE, 560066"
+  },
+  {
+    "id": 67,
+    "name": "Aastha Ortho Derma Centre",
+    "address": "No.42, 2Nd Cross Kamakya Layout, Banashankari 3Rd Stage",
+    "location": "BANGALORE, 560085"
+  },
+  {
+    "id": 68,
+    "name": "SHOBHA MATERNITY AND SURGICAL HEALTH CARE CENTRE",
+    "address": "No.17/12 Pr Building , 16Th Main, Btm Layout, 1St Stage, Tavarekere Layout",
+    "location": "BANGALORE, 560029"
+  },
+  {
+    "id": 69,
+    "name": "Nephroplus Dialysis Center-Kasturi Nagar",
+    "address": "6, 5th Main, B Channasandra Main Road, Kasturi Nagar",
+    "location": "Bengaluru, 560043"
+  },
+  {
+    "id": 70,
+    "name": "BACC Healthcare Pvt Ltd",
+    "address": "1109, 24Th Main Road, 1St Phase, J P Nagar",
+    "location": "BANGALORE, 560078"
+  },
+  {
+    "id": 71,
+    "name": "Trinity Central Hospital",
+    "address": "139, S C Road Sheshadripuram",
+    "location": "BANGALORE, 560020"
+  },
+  {
+    "id": 72,
+    "name": "MARUTHI MULTISPECIALITY HOSPITAL",
+    "address": "111, Radhakrishna main Road, Mines and Geology layout, Near Deepa Complex, Mallathahalli",
+    "location": "Banglore, 560056"
+  },
+  {
+    "id": 73,
+    "name": "SUNRISE HOSPITAL",
+    "address": "9 Dr Shet’S Building, Keerthi Harmony Road, Jayanthi Nagar Main Road Near Raghavendra Circle, Ramamurthy Circle , Ramamurthy Nagar",
+    "location": "BANGALORE, 560016"
+  },
+  {
+    "id": 74,
+    "name": "SAI THUNGA HEALTH CARE",
+    "address": "187/269/186, Agara Ring Road , H.S.R Layout",
+    "location": "BANGALORE, 560034"
+  },
+  {
+    "id": 75,
+    "name": "Nephroplus Dialysis Center-Marathahalli2",
+    "address": "Jeevika Hospital, 953, Marathahalli Outer Ring Road, Doddanekundi",
+    "location": "BANGALORE, 560037"
+  },
+  {
+    "id": 76,
+    "name": "ANUPAMAA HOSPITAL",
+    "address": "No. 377, 13Th Main Road, 80 Feet Road, A Sector, Yelahanka New Town",
+    "location": "BANGALORE, 560064"
+  },
+  {
+    "id": 77,
+    "name": "NephroPlus Dialysis Center-Yelahanka",
+    "address": "Dr. Sanjay S. Centre For Kidney and Diabetes 357/B, Bangalore- Bellary Road, Santhe Circle, Opposite RR Gold Palace, Yelahanka Old town",
+    "location": "Bangalore, 560064"
+  },
+  {
+    "id": 78,
+    "name": "ONCOVILLE PRIVATE LIMITED",
+    "address": "No.8, 80ft Road, 7th Block, 2nd Nagarabhavi",
+    "location": "BANGALORE, 560072"
+  },
+  {
+    "id": 79,
+    "name": "GYYNECARE MATERNITY AND GYNECOLOGY HOSPITAL",
+    "address": "80, Hmt Layout Dinnur Main Road Near Rt Nagar Police Station Rt Nagar",
+    "location": "BANGALORE, 560032"
+  },
+  {
+    "id": 80,
+    "name": "DR AGARWALS HEALTH CARE LIMITED RAJAJI NAGAR",
+    "address": "Nks Prime, New No.60, Old No.417, 20Th Main Road, 1St Block Rajaji Nagar",
+    "location": "BANGALORE, 560010"
+  },
+  {
+    "id": 81,
+    "name": "Raja Rajeswari Medical College & Hospital",
+    "address": "No.202, Kambipura, Mysore Road",
+    "location": "Bangalore, 560074"
+  },
+  {
+    "id": 82,
+    "name": "Central Leprosorium Hospital",
+    "address": "Near Binny Mill, 1st Cross, Magadi Road, Behind City Railway Station",
+    "location": "Bangalore, 560023"
+  },
+  {
+    "id": 83,
+    "name": "E.S.I Hospital, Basavangudi",
+    "address": "North Anjaneya Temple Street, Basavanagudi",
+    "location": "BANGALORE, 560004"
+  },
+  {
+    "id": 84,
+    "name": "E.S.I Hospital, Indiranagar",
+    "address": "HAL II Stage Indiranagar",
+    "location": "BANGALORE, 560008"
+  },
+  {
+    "id": 85,
+    "name": "Epidemic Diseases Hospital",
+    "address": "Bayapanahalli, Old Madras Road",
+    "location": "Bangalore, 560038"
+  },
+  {
+    "id": 86,
+    "name": "General Hospital, Jayanagar",
+    "address": "4th T Block, Opposite Sagar Hotel, Jayanagar",
+    "location": "Bengaluru"
+  },
+  {
+    "id": 87,
+    "name": "General Hospital, Palace Guttahalli",
+    "address": "5th Cross Rd, Palace Guttahalli",
+    "location": "Bengaluru"
+  },
+  {
+    "id": 88,
+    "name": "Govt. TB and CD Hospital",
+    "address": "Old Madras Road, Indira Nagar",
+    "location": "Bangalore"
+  },
+  {
+    "id": 89,
+    "name": "Haji Sir Ismail Sait Ghosha Hospital",
+    "address": "Indian Express , Venkataswamy Road, Shivaji Nagar",
+    "location": "Bangalore, 560051"
+  },
+  {
+    "id": 90,
+    "name": "Lady Willington State T.B Centre",
+    "address": "State T B Center, 4TH Main Road, Sampangiram Nagar",
+    "location": "Bangalore, 560027"
+  },
+  {
+    "id": 91,
+    "name": "Minto Ophthalmic Hospital",
+    "address": "A V Road, Chamrajpet",
+    "location": "Bangalore, 560002"
+  },
+  {
+    "id": 92,
+    "name": "S.D.S Tuberculosis & RGICD Hospital",
+    "address": "Siddharpur Police Station Road, Byrasandra",
+    "location": "Bangalore, 560029"
+  },
+  {
+    "id": 93,
+    "name": "Sanjay Gandhi Accident Hospital & Research Institute",
+    "address": "Byrasandra, Jaya Nagar , Near NIMHANS",
+    "location": "Bangalore, 560011"
+  },
+  {
+    "id": 94,
+    "name": "Sri.Jayachamarajendra Institute of Indian Medicine",
+    "address": "Sheshadri Road",
+    "location": "Bangalore, 560009"
+  },
+  {
+    "id": 95,
+    "name": "Venkateshwara Hospital",
+    "address": "No. 1, Sri Venkateshwara Temple Road, Tilak Nagar",
+    "location": "Bangalore, 560041"
+  },
+  {
+    "id": 96,
+    "name": "St. Philomina's Hospital",
+    "address": "Victoria Layout",
+    "location": "Bangalore"
+  },
+  {
+    "id": 97,
+    "name": "Basavanagudi Medical Centre",
+    "address": "No.84/1, RV Rd., Basavanagudi",
+    "location": "Bangalore, 560004"
+  },
+  {
+    "id": 98,
+    "name": "Jupiter Hospital and Institute of Vascular Surgery",
+    "address": "No.28, 7th Main, 9th Cross, Malleswaram",
+    "location": "Bangalore, 560003"
+  },
+  {
+    "id": 99,
+    "name": "Chord Road Hospital Pvt. Ltd.",
+    "address": "Chord Road (near VIMSA)",
+    "location": "Bangalore"
+  },
+  {
+    "id": 100,
+    "name": "Ramakrishna Hospitals",
+    "address": "Jayanagar",
+    "location": "Bangalore"
+  }
+]
