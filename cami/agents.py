@@ -9,6 +9,7 @@ from cami.config import MODEL_GEMINI_2_0_FLASH
 from cami.prompts import (
     TRIAGE_INSTRUCTION,
     claim_agent_instructions,
+    discharge_agent_instructions,
     policy_agent_instructions,
 )
 from cami.tools import (
@@ -17,9 +18,22 @@ from cami.tools import (
     check_membership,
     check_ongoing_claim,
     create_membership,
+    discharge_report_form,
+    discharge_report_status,
     policy_faqs,
     purchase_policy,
     start_claim,
+)
+
+discharge_agent = Agent(
+    name="discharge_agent",
+    description="A helpful agent that can help customer with discharge report, filling and updating.",
+    model=MODEL_GEMINI_2_0_FLASH,
+    instruction=discharge_agent_instructions,
+    tools=[
+        discharge_report_status,
+        discharge_report_form,
+    ],
 )
 
 claim_agent = Agent(

@@ -629,3 +629,141 @@ async def start_claim(patient_id: str) -> dict:
             "status": "error",
             "error_message": "Error creating claim. Please try again.",
         }
+
+
+async def discharge_report_status(patient_id: str) -> dict:
+    """Check Discharge Report Status for the Patient.
+
+    Args:
+        patient_id (str): Patient's ID
+
+    Returns:
+        dict: A dictionary containing keys:
+            - status: 'success' or 'error'.
+            - error_message: present only if error occurred.
+            - result: if successful status of the discharge report ('pending' or 'completed').
+    """
+    logger.info(f"Checking discharge report status for patient {patient_id}")
+
+    try:
+        claim_ref = db.collection("claims").document(patient_id)
+        claim_doc = await claim_ref.get()
+        if not claim_doc.exists:
+            return {
+                "status": "error",
+                "error_message": "No existing claim to check for disharge report status. Please start a new claim.",
+            }
+
+        selected_claim = claim_doc.to_dict()
+        if selected_claim is None:
+            return {
+                "status": "error",
+                "error_message": "No existing claim to check for disharge report status. Please start a new claim.",
+            }
+        claim = Claim(**selected_claim)
+        return {
+            "status": "success",
+            "result": f"Discharge Report Status: {claim.discharge_report_status}",
+        }
+    except Exception as e:
+        logger.error(f"Error checking claim: {e!s}")
+        return {
+            "status": "error",
+            "error_message": "Error discharge report status. Please try again.",
+        }
+
+
+async def discharge_report_form(patient_id: str) -> dict:
+    """Return the Discharge Report Form to be filled by the Patient.
+
+    Args:
+        patient_id (str): Patient's ID
+
+    Returns:
+        dict: A dictionary containing keys:
+            - status: 'success' or 'error'.
+            - error_message: present only if error occurred.
+            - result: if successful with discharge report form fields.
+    """
+    logger.info(f"Checking existing policy for patient {patient_id}")
+
+    def format_result(claim: Claim) -> str:
+        markdown_output = []
+        markdown_output.append("# Discharge Report Form Fields:\n")
+        discharge_report_instance = claim.discharge_report
+        for field_name, _ in DischargeReportTemplate.model_fields.items():
+            field_template_instance: FieldTemplate = getattr(discharge_report_instance, field_name)
+            markdown_output.appen(f"## {field_name}:")
+            field_data = field_template_instance.model_dump()
+            markdown_output.append(f" - required: {field_data['required']}")
+            markdown_output.append(f' - value: "{field_data["value"]}"')
+            markdown_output.append(f' - description: "{field_data["description"]}"')
+            markdown_output.append(f' - example: "{field_data["example"]}"')
+
+            markdown_output.append("\n")
+
+        return "\n".join(markdown_output)
+
+    try:
+        claim_ref = db.collection("claims").document(patient_id)
+        claim_doc = await claim_ref.get()
+        if not claim_doc.exists:
+            return {
+                "status": "error",
+                "error_message": "No existing claim found for Discharge Report Form. Please start a new claim.",
+            }
+
+        selected_claim = claim_doc.to_dict()
+        if selected_claim is None:
+            return {
+                "status": "error",
+                "error_message": "No existing claim found for Discharge Report Form. Please start a new claim.",
+            }
+        # claim exists, format the result
+        claim = Claim(**selected_claim)
+        return {
+            "status": "success",
+            "result": format_result(claim),
+        }
+
+    except Exception as e:
+        logger.error(f"Error checking claim: {e!s}")
+        return {
+            "status": "error",
+            "error_message": "Error checking existing claim. Please try again.",
+        }
+
+
+async def update_discharge_report_form_field(patient_id: str, field: str, value: str) -> dict:
+    """Start a new Claim for the Patient.
+
+    Args:
+        patient_id (str): Patient's ID
+        field (str): Field to update
+        value (str): The value of the field
+
+    Returns:
+        dict: A dictionary containing keys:
+            - status: 'success' or 'error'.
+            - error_message: present only if error occurred.
+            - result: if successful with update status of the field
+    """
+    logger.info(f"Update discharge form field: {field}:{value} for patient ID: {patient_id}")
+
+    try:
+        claim_ref = db.collection("claims").document(patient_id)
+        full_qualified_field = f""
+
+        await claim_ref.set(claim.model_dump())
+
+        return {
+            "status": "success",
+            "result": format_result(claim),
+        }
+
+    except Exception as e:
+        logger.error(f"Error creating claim: {e!s}")
+        return {
+            "status": "error",
+            "error_message": "Error creating claim. Please try again.",
+        }
