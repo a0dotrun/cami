@@ -693,7 +693,7 @@ async def discharge_report_form(patient_id: str) -> dict:
         discharge_report_instance = claim.discharge_report
         for field_name, _ in DischargeReportTemplate.model_fields.items():
             field_template_instance: FieldTemplate = getattr(discharge_report_instance, field_name)
-            markdown_output.appen(f"## {field_name}:")
+            markdown_output.append(f"## {field_name}:")
             field_data = field_template_instance.model_dump()
             markdown_output.append(f" - required: {field_data['required']}")
             markdown_output.append(f' - value: "{field_data["value"]}"')
@@ -727,7 +727,10 @@ async def discharge_report_form(patient_id: str) -> dict:
         }
 
     except Exception as e:
+        print("***************** F*** THIS GOT SCREWED **************")
+        print(e)
         logger.error(f"Error checking claim: {e!s}")
+        print("***************** F*** THIS GOT SCREWED **************")
         return {
             "status": "error",
             "error_message": "Error checking existing claim. Please try again.",
@@ -735,7 +738,7 @@ async def discharge_report_form(patient_id: str) -> dict:
 
 
 async def update_discharge_report_form_field(patient_id: str, field: str, value: str) -> dict:
-    """Start a new Claim for the Patient.
+    """Update Discharge Report Field for the provided Patient and value.
 
     Args:
         patient_id (str): Patient's ID
@@ -752,18 +755,47 @@ async def update_discharge_report_form_field(patient_id: str, field: str, value:
 
     try:
         claim_ref = db.collection("claims").document(patient_id)
-        full_qualified_field = f""
+        full_qualified_field = f"discharge_report.{field}.value"
 
-        await claim_ref.set(claim.model_dump())
+        await claim_ref.update({full_qualified_field: value})
 
         return {
             "status": "success",
-            "result": format_result(claim),
+            "result": f"Successfully updated field: {field} with value: {value}",
         }
-
     except Exception as e:
-        logger.error(f"Error creating claim: {e!s}")
+        logger.error(f"Error updating field: {e!s}")
         return {
             "status": "error",
-            "error_message": "Error creating claim. Please try again.",
+            "error_message": "Error updating field. Please try again.",
+        }
+
+
+async def update_discharge_report_status(patient_id: str, status: str) -> dict:
+    """Update Discharge Report Status for the Patient.
+
+    Args:
+        patient_id (str): Patient's ID
+        status (str): status of the report 'completed' or 'pending'
+
+    Returns:
+        dict: A dictionary containing keys:
+            - status: 'success' or 'error'.
+            - error_message: present only if error occurred.
+            - result: if successful with update status of the field
+    """
+    logger.info(f"Updating discharge report status: {status}")
+
+    try:
+        claim_ref = db.collection("claims").document(patient_id)
+        await claim_ref.update({"discharge_report_status": status})
+        return {
+            "status": "success",
+            "result": f"Successfully updated discharge report status: {status}",
+        }
+    except Exception as e:
+        logger.error(f"Error updating discharge report status: {e!s}")
+        return {
+            "status": "error",
+            "error_message": "Error updating discharge report status. Please try again.",
         }

@@ -49,13 +49,16 @@ def discharge_agent_instructions(context: ReadonlyContext) -> str:
     Use the following routine to support the patient.
     1. Make sure Patient ID is available. Otherwise collect the Patient ID.
     2. Use the `discharge_report_status` tool to check the status of the discharge report.
-    3. If the discharge report status is 'pending', notify the customer to fill up the discharge report.
+    3. If the discharge report status is 'pending', notify the customer to fill up the discharge report form.
         Else notify the customer that discharge report is already completed or would like to modify the existing report.
     4. Use the tool `discharge_report_form` to collect the required information from the customer. Make sure all the required fields are filled.
         If you are confused ask for clarification.
-    5. Use the tool `update_discharge_report_form_field` to update each discharge report form field.
+    5. Use the tool `update_discharge_report_form_field` to update each field.
+    6. Confirm the discharge report form details, repeat if anything is missing.
+    7. Take confirmation of completion, use tool `update_discharge_report_status` to mark status 'completed'. Transfer back to the claim agent.
+        If customer doesn't confirm or doesnt' want to proceed ahead, mark the status to 'pending'.
 
-    If the customer asks anything else, transfer back to the claim agent.
+    If the customer asks anything else that you cannot suppor, transfer back to the claim agent.
     """
 
 

@@ -23,6 +23,8 @@ from cami.tools import (
     policy_faqs,
     purchase_policy,
     start_claim,
+    update_discharge_report_form_field,
+    update_discharge_report_status,
 )
 
 discharge_agent = Agent(
@@ -33,6 +35,8 @@ discharge_agent = Agent(
     tools=[
         discharge_report_status,
         discharge_report_form,
+        update_discharge_report_form_field,
+        update_discharge_report_status,
     ],
 )
 
@@ -40,6 +44,7 @@ claim_agent = Agent(
     name="claim_agent",
     description="A helpful agent that can help customer with insurance claims, ongoing claims and start claim process.",
     model=MODEL_GEMINI_2_0_FLASH,
+    sub_agents=[discharge_agent],
     instruction=claim_agent_instructions,
     tools=[check_ongoing_claim, start_claim],
 )
