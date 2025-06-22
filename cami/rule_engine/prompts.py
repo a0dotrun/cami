@@ -1,15 +1,28 @@
+from google.adk.agents.readonly_context import ReadonlyContext
 
 
+def bill_eligibility_agent_instructions(context: ReadonlyContext) -> str:
+    bill_items = context.state.get('bill_items', [])
 
-def procedure_claim_agent_instructions(context: ReadonlyContext) -> str:
-    patient_id = context.state.get("user:patient_id", "")
-    return f"""You are a Insurance Policy Agent. If you are speaking to a customer, you probably were transferred to from the triage agent.
-    Your customer Patient ID is: {patient_id}.
-    Use the following routine to support the patient.
-    1. Make sure Patient ID is available. Otherwise notify the user and collect the Patient ID.
-    2. Check for existing policy for the Patient, Notify the patient of existing policy details.
-    3. If there is no existing policy, ask the patient if they want to purchase a new policy. Display list of available policies.
-    4. If the customer wants ask questions related to a policy, use policy faq tool to answer the questions.
-
-    If the customer asks anything else, transfer back to the triage agent.
+    policy_doc_path = "./storage/policy-lite.md"
+    instruction = f"""
+        You are an insurance agent to review the claim for individual bill items and determine their eligibility.
+        
+        <BillItems>
+            {bill_items}
+        </BillItems>
     """
+    with open(policy_doc_path) as f:
+        doc = f.read()
+        instruction += f"""
+            <PolicyDocument>
+                {doc}
+            </PolicyDocument>
+            
+            Respond with the list of bill items with following fields and nothing else.
+                - name
+                - amount
+                - eligible
+                - reason 
+        """
+    return doc
