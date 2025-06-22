@@ -2,6 +2,7 @@ import secrets
 from datetime import UTC, datetime
 from typing import Literal
 
+from google.cloud import firestore
 import firebase_admin
 from firebase_admin import firestore_async
 from google.adk.agents import Agent
@@ -14,6 +15,8 @@ from cami.config import MODEL_GEMINI_2_0_FLASH, firebase_credentials
 from cami.storage.policies import get_doc_from_policy
 from cami.storage.report import discharge_report_template
 from cami.utils.logger import logger
+import ulid
+
 
 firebase_admin.initialize_app(firebase_credentials)
 
@@ -54,24 +57,6 @@ db = firestore_async.client()
 #         return self.name
 
 
-class FieldTemplate(BaseModel):
-    value: str = Field(default="")
-    required: bool
-    description: str
-    example: str
-
-
-class DischargeReportTemplate(BaseModel):
-    patient_name: FieldTemplate
-    address: FieldTemplate
-    phone_number: FieldTemplate
-    date_of_birth: FieldTemplate
-    gender: FieldTemplate
-    method_of_admission: FieldTemplate
-    reason_for_hospitalization: FieldTemplate
-    department: FieldTemplate
-
-
 class PolicyPlan(BaseModel):
     name: str
     policy_id: str
@@ -84,113 +69,6 @@ def policies_in_db() -> list[PolicyPlan]:
         PolicyPlan(name="Star Health Lite", policy_id="SHL7760", sum_insured=20000),
     ]
     return policies
-
-
-# async def discharge_summary_report(patient_id: str) -> dict:
-#     """Checks if a patient's discharge summary report is 'completed' or 'pending'.
-
-#     This tool takes a patient ID and returns the status of their discharge summary.
-#     It does not return the content of the summary itself.
-
-#     Args:
-#         patient_id (str): The unique identifier for the patient (e.g., "PID-12345").
-
-#     Returns:
-#         dict: A dictionary with two keys:
-#               - 'status': The status of the tool call ('success' or 'error').
-#               - 'report': The status of the discharge summary ('completed' or 'pending')
-#                          OR an error message if the tool call failed.
-
-#               - Example (Pending):
-#                 {"status": "success", "report": "pending"}
-#               - Example (Completed):
-#                 {"status": "success", "report": "completed"}
-#               - Example (Error):
-#                 {"status": "error", "error_message": "Patient ID 'PID-99999' not found."}
-#     """
-#     logger.info(
-#         "[Tool Called: discharge_summary_report] with args: patient_id='%s'",
-#         patient_id,
-#     )
-
-#     return {"status": "success", "report": "pending"}
-
-
-# async def discharge_report(patient_id: str) -> dict:
-#     """Retrieve a patient's discharge report.
-
-#     The report contains information about which fields are required and which have already been filled out.
-
-#     Args:
-#         patient_id (str):  The unique identifier for the patient.
-
-#     Returns:
-#         dict: A dictionary containing keys:
-#             - status: 'success' or 'error'.
-#             - error_message: present only if error occurred.
-#             - result: if successful with discharge report details.
-#     """
-
-#     def format_result(items: dict):
-#         markdowns = []
-#         for k, v in items.items():
-#             item = f"""
-#             {k}: {v["value"]}\n
-#             - required: {v["required"]}\n
-#             - description: {v["description"]}\n
-#             \n\n
-#             """
-#             markdowns.append(item)
-#         "".join(list(markdowns))
-
-#     discharge_summary_ref = db.collection("discharge_summaries").document(patient_id)
-#     discharge_summary_doc = await discharge_summary_ref.get()
-#     if discharge_summary_doc.exists:
-#         items = discharge_summary_doc.to_dict()
-#         result = format_result(items)
-#         print("***************** results: ", result)
-#         return {"status": "success", "result": result}
-#     return {
-#         "status": "error",
-#         "error_message": "Discharge summary report does not exists.",
-#     }
-
-
-# async def update_discharge_summary_field(
-#     patient_id: str, field_key: str, field_value: str
-# ) -> dict:
-#     """Update a field in the discharge summary report for a given patient_id.
-
-#     Args:
-#         patient_id (str): The unique identifier for the patient.
-#         field_key (str): The key of the field to update.
-#         field_value (str): The value to set for the field.
-
-#     Returns:
-#         dict: A dictionary containing keys:
-#             - status: 'success' or 'error'.
-#             - error_message: present only if error occurred.
-#             - result: if successful with update status of the operation.
-#     """
-#     logger.info(
-#         f"Updating field {field_key} for patient {patient_id} with value {field_value}"
-#     )
-#     discharge_summary_ref = db.collection("discharge_summaries").document(patient_id)
-#     discharge_summary_doc = await discharge_summary_ref.get()
-#     if discharge_summary_doc.exists:
-#         document_dict = discharge_summary_doc.to_dict() or {}
-#         if field_key is not None and field_key in document_dict:
-#             await discharge_summary_ref.update({f"{field_key}.value": field_value})
-#             return {"status": "success", "result": "Field updated successfully"}
-#         else:
-#             return {
-#                 "status": "error",
-#                 "error_message": "Error updating field, the field does not exists.",
-#             }
-#     return {
-#         "status": "error",
-#         "error_message": "Discharge summary not found",
-#     }
 
 
 async def check_membership(patient_id: str) -> dict:
@@ -290,77 +168,6 @@ async def create_membership(first_name: str, last_name: str, phone_number: str, 
             "status": "error",
             "error_message": "Failed to create membership",
         }
-
-
-# async def discharge_summary_status(patient_id: str) -> dict:
-#     """Check patient's discharge summary status for the given patient_id.
-
-#     Args:
-#         patient_id (str): The unique identifier for the patient.
-
-#     Returns:
-#         dict: A dictionary containing keys:
-#             - status: 'success' or 'error'.
-#             - error_message: present only if error occurred.
-#             - result: if successful with discharge summary status value 'pending' or 'completed'
-#     """
-#     try:
-#         user_ref = db.collection("users").document(patient_id)
-#         user_doc = await user_ref.get()
-
-#         if user_doc.exists:
-#             user_data = user_doc.to_dict()
-#             if user_data is None:
-#                 return {"status": "error", "error_message": "Patient does not exists."}
-#             return {
-#                 "status": "success",
-#                 "result": user_data["discharge_summary_report"],
-#             }
-#         else:
-#             return {"status": "error", "error_message": "Patient does not exists."}
-#     except Exception as e:
-#         logger.error(f"Error checking membership for patient {patient_id}: {e!s}")
-#         return {
-#             "status": "error",
-#             "error_message": "Error when checking for discharge summary status",
-#         }
-
-
-# async def update_discharge_summary_status(patient_id: str, status: str) -> dict:
-#     """Update patient's discharge summary status for the given patient_id.
-
-#     Args:
-#         patient_id (str): The unique identifier for the patient.
-#         status (str): The status of the discharge summary either 'completed' or 'pending'
-
-#     Returns:
-#         dict: A dictionary containing keys:
-#             - status: 'success' or 'error'.
-#             - error_message: present only if error occurred.
-#             - result: if successful with update status of the operation.
-#     """
-#     try:
-#         user_ref = db.collection("users").document(patient_id)
-#         user_doc = await user_ref.get()
-
-#         if not user_doc.exists:
-#             return {"status": "error", "error_message": "Patient does not exist."}
-
-#         # Update the discharge_summary_report field
-#         await user_ref.update({"discharge_summary_report": status})
-
-#         return {
-#             "status": "success",
-#             "result": f"Successfully updated discharge summary status report to {status}",
-#         }
-#     except Exception as e:
-#         logger.error(
-#             f"Error updating discharge summary status for patient {patient_id}: {e!s}"
-#         )
-#         return {
-#             "status": "error",
-#             "error_message": "Error when updating discharge summary status",
-#         }
 
 
 def available_policies() -> dict:
@@ -521,12 +328,37 @@ async def policy_faqs(policy_id: str, query: str, tool_context: ToolContext) -> 
     }
 
 
+class FieldTemplate(BaseModel):
+    value: str = Field(default="")
+    required: bool
+    description: str
+    example: str
+
+
+class DischargeReportTemplate(BaseModel):
+    patient_name: FieldTemplate
+    address: FieldTemplate
+    phone_number: FieldTemplate
+    date_of_birth: FieldTemplate
+    gender: FieldTemplate
+    method_of_admission: FieldTemplate
+    reason_for_hospitalization: FieldTemplate
+    department: FieldTemplate
+
+
+class BillLineItemField(BaseModel):
+    name: str = Field(default="")
+    charges: int
+    id: str
+
+
 class Claim(BaseModel):
     status: Literal["ongoing", "completed", "expired"]
     discharge_report_status: Literal["pending", "completed"]
-    treatment_report_status: Literal["pending", "completed"]
+    bill_report_status: Literal["pending", "completed"]
     started_on: datetime
     discharge_report: DischargeReportTemplate
+    bill_line_items: list[BillLineItemField] = Field(default_factory=list)
 
 
 async def check_ongoing_claim(patient_id: str) -> dict:
@@ -548,7 +380,7 @@ async def check_ongoing_claim(patient_id: str) -> dict:
     def format_result(claim: Claim) -> str:
         return f"""Claim Status: {claim.status}
         Discharge Report Status: {claim.discharge_report_status}
-        Treatment Report Status: {claim.treatment_report_status}
+        Bill Report Status: {claim.bill_report_status}
         Started On: {claim.started_on.strftime("%Y-%m-%d %H:%M:%S")}
         """
 
@@ -601,7 +433,7 @@ async def start_claim(patient_id: str) -> dict:
     def format_result(claim: Claim) -> str:
         return f"""Claim Status: {claim.status}
         Discharge Report Status: {claim.discharge_report_status}
-        Treatment Report Status: {claim.treatment_report_status}
+        Bill Report Status: {claim.bill_report_status}
         Started On: {claim.started_on.strftime("%Y-%m-%d %H:%M:%S")}
         """
 
@@ -612,9 +444,10 @@ async def start_claim(patient_id: str) -> dict:
         claim = Claim(
             status="ongoing",
             discharge_report_status="pending",
-            treatment_report_status="pending",
+            bill_report_status="pending",
             started_on=datetime.now(UTC),
             discharge_report=DischargeReportTemplate(**discharge_report_template),
+            bill_line_items=[],
         )
         await claim_ref.set(claim.model_dump())
 
@@ -798,4 +631,226 @@ async def update_discharge_report_status(patient_id: str, status: str) -> dict:
         return {
             "status": "error",
             "error_message": "Error updating discharge report status. Please try again.",
+        }
+
+
+async def bill_report_status(patient_id: str) -> dict:
+    """Check Bill Report Status for the Patient.
+
+    Args:
+        patient_id (str): Patient's ID
+
+    Returns:
+        dict: A dictionary containing keys:
+            - status: 'success' or 'error'.
+            - error_message: present only if error occurred.
+            - result: if successful status of the bill report ('pending' or 'completed').
+    """
+    logger.info(f"Checking bill report status for patient {patient_id}")
+
+    try:
+        claim_ref = db.collection("claims").document(patient_id)
+        claim_doc = await claim_ref.get()
+        if not claim_doc.exists:
+            return {
+                "status": "error",
+                "error_message": "No existing claim to check for bill report status. Please start a new claim.",
+            }
+
+        selected_claim = claim_doc.to_dict()
+        if selected_claim is None:
+            return {
+                "status": "error",
+                "error_message": "No existing claim to check for bill report status. Please start a new claim.",
+            }
+        claim = Claim(**selected_claim)
+        return {
+            "status": "success",
+            "result": f"Bill Report Status: {claim.bill_report_status}",
+        }
+    except Exception as e:
+        logger.error(f"Error checking claim: {e!s}")
+        return {
+            "status": "error",
+            "error_message": "Error bill report status. Please try again.",
+        }
+
+
+async def update_bill_report_status(patient_id: str, status: str) -> dict:
+    """Update Bill Report Status for the Patient.
+
+    Args:
+        patient_id (str): Patient's ID
+        status (str): status of the report 'completed' or 'pending'
+
+    Returns:
+        dict: A dictionary containing keys:
+            - status: 'success' or 'error'.
+            - error_message: present only if error occurred.
+            - result: if successful with update status of the field
+    """
+    logger.info(f"Updating bill report status: {status}")
+
+    try:
+        claim_ref = db.collection("claims").document(patient_id)
+        await claim_ref.update({"bill_report_status": status})
+        return {
+            "status": "success",
+            "result": f"Successfully updated bill report status: {status}",
+        }
+    except Exception as e:
+        logger.error(f"Error updating bill report status: {e!s}")
+        return {
+            "status": "error",
+            "error_message": "Error updating bill report status. Please try again.",
+        }
+
+
+async def add_bill_item(patient_id: str, name: str, charges: int) -> dict:
+    """Add Bill Item for Patient with name and charges.
+
+    Args:
+        patient_id (str): Patient's ID.
+        name (str): billable item name.
+        charges (int): amount in rupees.
+
+    Returns:
+        dict: A dictionary containing keys:
+            - status: 'success' or 'error'.
+            - error_message: present only if error occurred.
+            - result: if successful with added details.
+    """
+    logger.info(f"Adding bill item for patient: {patient_id} name: {name} charges: {charges}")
+
+    try:
+        claim_ref = db.collection("claims").document(patient_id)
+        bill_item_id = str(ulid.new())
+        await claim_ref.update(
+            {
+                "bill_line_items": firestore.ArrayUnion(
+                    [
+                        {
+                            "id": bill_item_id,
+                            "name": name,
+                            "charges": charges,
+                        }
+                    ]
+                ),
+            }
+        )
+        return {
+            "status": "success",
+            "result": f"Successfully added bill item with ID: {bill_item_id}",
+        }
+    except Exception as e:
+        logger.error(f"Error adding bill item: {e!s}")
+        return {
+            "status": "error",
+            "error_message": "Error adding bill item. Please try again.",
+        }
+
+
+async def list_bill_items(patient_id: str) -> dict:
+    """List all bill items for a patient.
+
+    Args:
+        patient_id (str): Patient's ID
+
+    Returns:
+        dict: A dictionary with:
+            - status: 'success' or 'error'
+            - result: list of bill items (if any)
+            - error_message: if error occurred
+    """
+    logger.info(f"Fetching bill items for patient: {patient_id}")
+
+    def format_result(items: list[BillLineItemField]):
+        markdown_output = []
+        markdown_output.append("# Bill Items:\n")
+        for item in items:
+            markdown_output.append(f"## ID: {item.id}")
+            markdown_output.append(f" - name: {item.name}")
+            markdown_output.append(f" - charges: {item.charges}")
+
+            markdown_output.append("\n")
+
+        return "\n".join(markdown_output)
+
+    try:
+        claim_ref = db.collection("claims").document(patient_id)
+        doc = await claim_ref.get()
+
+        if not doc.exists:
+            return {
+                "status": "error",
+                "error_message": f"No claim found for patient ID: {patient_id}",
+            }
+
+        data = doc.to_dict() or {}
+        claim = Claim(**data)
+        result = format_result(claim.bill_line_items)
+        return {
+            "status": "success",
+            "result": result,
+        }
+
+    except Exception as e:
+        logger.exception("Error fetching bill items")
+        return {
+            "status": "error",
+            "error_message": str(e) or "Error fetching bill items.",
+        }
+
+
+# TODO: @sanchitrk this sometimes fails
+def update_bill_report_item(patient_id: str, id: str, name: str, charges: str) -> dict:
+    """Update a specific bill item in the bill_line_items array by item ID.
+
+    Args:
+        patient_id (str): ID of the patient
+        id (str): ID of the bill item to update
+        name (str): Updated bill item name
+        charges (str): Updated charges in rupees
+
+    Returns:
+        dict: Result with status and optional error or updated item
+    """
+    logger.info(
+        f"Updating bill item {id} for patient {patient_id} with name: {name}, charges: {charges}"
+    )
+
+    try:
+        claim_ref = db.collection("claims").document(patient_id)
+        doc = claim_ref.get()
+
+        if not doc.exists:
+            return {"status": "error", "error_message": "Claim not found"}
+
+        data = doc.to_dict()
+        bill_items = data.get("bill_line_items", [])
+
+        updated = False
+        for item in bill_items:
+            if item.get("id") == id:
+                item["name"] = name
+                item["charges"] = charges
+                updated = True
+                break
+
+        if not updated:
+            return {"status": "error", "error_message": "Bill item ID not found"}
+
+        # Write back the updated array
+        claim_ref.update({"bill_line_items": bill_items})
+
+        return {
+            "status": "success",
+            "result": f"Successfully updated bill item with ID: {id} name: {name} charges: {charges}",
+        }
+
+    except Exception as e:
+        logger.exception("Error updating bill item")
+        return {
+            "status": "error",
+            "error_message": "Error updateing billl item. Please try again.",
         }
