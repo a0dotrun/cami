@@ -9,12 +9,18 @@
 
 ---
 
-## 2. Sum Insured (SI)
+## 2. Policy Holder Details
 
-The maximum liability of the Insurer for all admissible claims during a Policy Year.
+- **Name:** Kireeti
+- **Age:** 32
+- **Sum Insured:** ₹5,00,000
 
-- **PolicyHolder is insured for ₹5,00,000**
+---
 
+## 3. Claim Details
+
+- **Total Claim Amount:** {total_claim_amount}
+- **Hospitalisation Days:** {hospitalisation_days}
 ---
 
 ## 3. Key Inclusions (Covered Treatments & Expenses):\*\*

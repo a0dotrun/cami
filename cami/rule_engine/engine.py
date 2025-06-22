@@ -14,14 +14,17 @@ class RuleEngine:
         remaining_sum = 500000  # Todo: Change this to get from patient details
 
         for bill_item in self.bill_items:
-            claim_amount = bill_item["amount"]
-
-            if claim_amount <= remaining_sum:
-                approved_amount = claim_amount
-                remaining_sum -= claim_amount
+            if not bill_item["eligible"]:
+                approved_amount = 0
             else:
-                approved_amount = remaining_sum
-                remaining_sum = 0
+                claim_amount = bill_item["amount"]
+
+                if claim_amount <= remaining_sum:
+                    approved_amount = claim_amount
+                    remaining_sum -= claim_amount
+                else:
+                    approved_amount = remaining_sum
+                    remaining_sum = 0
 
             bill_item["approved_amount"] = approved_amount
 
