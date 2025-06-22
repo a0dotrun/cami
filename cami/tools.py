@@ -1,5 +1,6 @@
 import secrets
 from datetime import UTC, datetime
+from typing import Literal
 
 import firebase_admin
 from firebase_admin import firestore_async
@@ -7,10 +8,11 @@ from google.adk.agents import Agent
 from google.adk.agents.readonly_context import ReadonlyContext
 from google.adk.tools import ToolContext
 from google.adk.tools.agent_tool import AgentTool
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from cami.config import MODEL_GEMINI_2_0_FLASH, firebase_credentials
 from cami.storage.policies import get_doc_from_policy
+from cami.storage.report import discharge_report_template
 from cami.utils.logger import logger
 
 firebase_admin.initialize_app(firebase_credentials)
@@ -52,56 +54,22 @@ db = firestore_async.client()
 #         return self.name
 
 
-discharge_summary_template: dict[str, dict] = {
-    "patient_name": {
-        "value": "",
-        "required": True,
-        "description": "The patient's full legal name, including first and last name.",
-        "example": "John Doe",
-    },
-    "address": {
-        "value": "",
-        "required": True,
-        "description": "The patient's complete mailing address.",
-        "example": "123 Main Street, Any town, ST 12345",
-    },
-    "phone_number": {
-        "value": "",
-        "required": True,
-        "description": "The patient's primary contact phone number, including the country code. Default country code is IND +91",
-        "example": "+1-555-123-4567",
-    },
-    "date_of_birth": {
-        "value": "",
-        "required": True,
-        "description": "The patient's date of birth in YYYY-MM-DD format.",
-        "example": "1990-06-15",
-    },
-    "gender": {
-        "value": "",
-        "required": True,
-        "description": "The patient's gender.",
-        "choices": ["Male", "Female", "Other", "Prefer not to say"],
-    },
-    "method_of_admission": {
-        "value": "",
-        "required": True,
-        "description": "The method by which the patient was admitted to the hospital.",
-        "choices": ["Elective", "Emergency", "Transfer", "Newborn", "Other"],
-    },
-    "reason_for_hospitalization": {
-        "value": "",
-        "required": True,
-        "description": "A brief description of the primary medical reason, chief complaint, or symptoms leading to hospitalization.",
-        "example": "Patient presented with severe chest pain and shortness of breath.",
-    },
-    "department": {
-        "value": "",
-        "required": False,
-        "description": "The specific hospital department the patient was admitted to.",
-        "example": "Cardiology",
-    },
-}
+class FieldTemplate(BaseModel):
+    value: str = Field(default="")
+    required: bool
+    description: str
+    example: str
+
+
+class DischargeReportTemplate(BaseModel):
+    patient_name: FieldTemplate
+    address: FieldTemplate
+    phone_number: FieldTemplate
+    date_of_birth: FieldTemplate
+    gender: FieldTemplate
+    method_of_admission: FieldTemplate
+    reason_for_hospitalization: FieldTemplate
+    department: FieldTemplate
 
 
 class PolicyPlan(BaseModel):
@@ -553,7 +521,15 @@ async def policy_faqs(policy_id: str, query: str, tool_context: ToolContext) -> 
     }
 
 
-def check_ongoing_claim(patient_id: str) -> dict:
+class Claim(BaseModel):
+    status: Literal["ongoing", "completed", "expired"]
+    discharge_report_status: Literal["pending", "completed"]
+    treatment_report_status: Literal["pending", "completed"]
+    started_on: datetime
+    discharge_report: DischargeReportTemplate
+
+
+async def check_ongoing_claim(patient_id: str) -> dict:
     """Check if there is an ongoing claim for the patient.
 
     Args:
@@ -565,13 +541,91 @@ def check_ongoing_claim(patient_id: str) -> dict:
             - error_message: present only if error occurred.
             - result: if successful with ongoing claim details.
     """
-    logger.info(f"Checking ongoing claim for patient {patient_id}")
-    result = """
-    Claim ID: CLM-1111\n
-    Claim Status: Ongoing\n
-    Discharge Summary Report: Pending\n
+    print("**************** CHECK ONGOING CLAIM ****************")
+    logger.info(f"Checking existing policy for patient {patient_id}")
+    print("**************** CHECK ONGOING CLAIM ****************")
+
+    def format_result(claim: Claim) -> str:
+        return f"""Claim Status: {claim.status}
+        Discharge Report Status: {claim.discharge_report_status}
+        Treatment Report Status: {claim.treatment_report_status}
+        Started On: {claim.started_on.strftime("%Y-%m-%d %H:%M:%S")}
+        """
+
+    try:
+        claim_ref = db.collection("claims").document(patient_id)
+        claim_doc = await claim_ref.get()
+        if not claim_doc.exists:
+            return {
+                "status": "error",
+                "error_message": "No existing claim found for the patient. Please start a new claim.",
+            }
+
+        selected_claim = claim_doc.to_dict()
+        if selected_claim is None:
+            return {
+                "status": "error",
+                "error_message": "No existing claim found for the patient. Please start a new claim.",
+            }
+        # claim exists, format the result
+        claim = Claim(**selected_claim)
+        return {
+            "status": "success",
+            "result": format_result(claim),
+        }
+
+    except Exception as e:
+        logger.error(f"Error checking claim: {e!s}")
+        return {
+            "status": "error",
+            "error_message": "Error checking existing claim. Please try again.",
+        }
+
+
+async def start_claim(patient_id: str) -> dict:
+    """Start a new Claim for the Patient.
+
+    Args:
+        patient_id (str): Patient's ID
+
+    Returns:
+        dict: A dictionary containing keys:
+            - status: 'success' or 'error'.
+            - error_message: present only if error occurred.
+            - result: if successful with ongoing claim details.
     """
-    return {
-        "status": "success",
-        "result": result,
-    }
+    print("**************** START A NEW CLAIM ****************")
+    logger.info(f"Starting new claim for patient {patient_id}")
+    print("**************** START A NEW CLAIM ****************")
+
+    def format_result(claim: Claim) -> str:
+        return f"""Claim Status: {claim.status}
+        Discharge Report Status: {claim.discharge_report_status}
+        Treatment Report Status: {claim.treatment_report_status}
+        Started On: {claim.started_on.strftime("%Y-%m-%d %H:%M:%S")}
+        """
+
+    try:
+        claim_ref = db.collection("claims").document(patient_id)
+
+        # Prepare claim document
+        claim = Claim(
+            status="ongoing",
+            discharge_report_status="pending",
+            treatment_report_status="pending",
+            started_on=datetime.now(UTC),
+            discharge_report=DischargeReportTemplate(**discharge_report_template),
+        )
+        await claim_ref.set(claim.model_dump())
+
+        return {
+            "status": "success",
+            "result": format_result(claim),
+        }
+
+    except Exception as e:
+        logger.error(f"Error creating claim: {e!s}")
+        return {
+            "status": "error",
+            "error_message": "Error creating claim. Please try again.",
+        }

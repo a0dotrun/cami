@@ -19,14 +19,15 @@ from cami.tools import (
     create_membership,
     policy_faqs,
     purchase_policy,
+    start_claim,
 )
 
 claim_agent = Agent(
     name="claim_agent",
-    description="A helpful agent that can help customer with insurance claims, ongoing claims and new claims.",
+    description="A helpful agent that can help customer with insurance claims, ongoing claims and start claim process.",
     model=MODEL_GEMINI_2_0_FLASH,
     instruction=claim_agent_instructions,
-    tools=[check_ongoing_claim],
+    tools=[check_ongoing_claim, start_claim],
 )
 
 
@@ -82,6 +83,6 @@ triage_agent = Agent(
     instruction=TRIAGE_INSTRUCTION,
     description="Main customer service and triaging agent.",
     sub_agents=[policy_agent, claim_agent],
-    tools=[check_membership, create_membership],
+    tools=[check_membership, create_membership, check_existing_policy],
     after_tool_callback=on_after_membership_tool,
 )
