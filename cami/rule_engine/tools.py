@@ -1,16 +1,13 @@
-from typing import Any
+import json
 
-from google.adk.agents import Agent
-from google.adk.tools.base_tool import BaseTool
 from google.adk.tools.tool_context import ToolContext
 from google.adk.tools.agent_tool import AgentTool
-from pydantic import BaseModel
 
 from .engine import RuleEngine
 from .agents import bill_eligibility_agent
 
 
-async def rule_engine_tool(claim: dict, tool_context: ToolContext) -> dict:
+async def rule_engine_tool(claim: dict, tool_context: ToolContext) -> list:
     """
     Verify the claim against the policy document
 
@@ -18,14 +15,18 @@ async def rule_engine_tool(claim: dict, tool_context: ToolContext) -> dict:
         claim (dict): Claim document
 
     Returns:
-        dict: Claim document -- bill_items with approved_amount, eligibility and reason
+        list: Bill Items with name, approved_amount, eligible and reason
     """
 
-    tool_context.state["claim:bill_items"] = claim["bill_items"]
+    bill_items = claim.get('bill_items', [])
+    tool_context.state["claim:bill_items"] = bill_items
     agent_tool = AgentTool(agent=bill_eligibility_agent)
     result = await agent_tool.run_async(
-        args={},  # Todo: What should we send?
+        args={"request": "claims from user"},  # Todo: What should we send?
         tool_context=tool_context
     )
+    cleaned_result = result.replace("\n", "").strip("```").strip("json")
+    cleaned_result = json.loads(cleaned_result)
 
-    return RuleEngine(result).process()
+    updated_bill_items = RuleEngine(bill_items=cleaned_result).process()
+    return updated_bill_items
