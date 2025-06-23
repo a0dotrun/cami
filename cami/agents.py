@@ -12,7 +12,7 @@ from cami.prompts import (
     discharge_agent_instructions,
     policy_agent_instructions,
 )
-from cami.rule_engine.tools import verify_claim_tool
+from cami.rule_engine.tools import verify_claim
 from cami.tools import (
     add_bill_item,
     available_policies,
@@ -67,7 +67,7 @@ claim_agent = Agent(
     model=MODEL_GEMINI_2_0_FLASH,
     sub_agents=[discharge_agent, bill_agent],
     instruction=claim_agent_instructions,
-    tools=[check_ongoing_claim, start_claim, verify_claim_tool],
+    tools=[check_ongoing_claim, start_claim, verify_claim],
 )
 
 

@@ -1,18 +1,16 @@
 from google.adk.tools.agent_tool import AgentTool
 from google.adk.tools.tool_context import ToolContext
 
-from cami.tools import BillLineItemField, list_bill_items_as_data
-
-from .db_utils import get_info
+from .db_utils import get_patient_info
 from .formatter_agent import output_formatter_agent
-from .rule_engine_agent import rule_engine_agent
+from .rule_engine_agent import verify_claim_agent
 
 
 async def correct_approvals(patient_id, bill_items):
     print("Correcting Approvals")
 
-    info = await get_info(patient_id=patient_id)
-    sum_insured = info.get("sum_insured", 0)
+    patient_info = await get_patient_info(patient_id=patient_id)
+    sum_insured = patient_info.get("sum_insured", 0)
     for item in bill_items:
         print(f"Item: {item}")
         if item["is_eligible"]:
@@ -26,47 +24,29 @@ async def correct_approvals(patient_id, bill_items):
     return bill_items
 
 
-async def verify_claim_tool(patient_id: str, tool_context: ToolContext) -> str:
-    """Verify the bill items claim against the policy document.
+async def verify_claim(patient_id: str, tool_context: ToolContext) -> str:
+    """Verifies the claimable bill items against the policy document for the Patient.
 
     Args:
         patient_id (str): Patient ID
 
     Returns:
-        str: Markdown formatted bill items report for user review
+        str: Markdown formatted verified claim report.
     """
-
-    def format_bills(items: list[BillLineItemField]) -> str:
-        d = {}
-        for i in items:
-            d["name"] = i.name
-            d["charges"] = i.charges
-            d["id"] = i.id
-        return d
-
-    response = await list_bill_items_as_data(patient_id=patient_id)
-    print("Response from list_bill_items_as_data ", response)
-    if response.get("status") != "success":
-        return "Error fetching bill items report"
-
-    bill_items: list[BillLineItemField] = response["result"]
-    bill_items_dict = format_bills(bill_items)
-
-    tool_context.state["claim:bill_items"] = bill_items_dict
-    rule_engine_agent_tool = AgentTool(agent=rule_engine_agent)
-    bill_items_verified = await rule_engine_agent_tool.run_async(
-        args={"request": "claims from user"},
+    verify_claim_agent_as_tool = AgentTool(agent=verify_claim_agent)
+    verified_bill = await verify_claim_agent_as_tool.run_async(
+        args={"request": "verify claim based on my policy and provided bill items"},
         tool_context=tool_context,
     )
-    print("Result from rule_engine_agent_tool ", bill_items_verified)
-    bill_items = bill_items_verified["bill_items"]
+    verified_bill_corrected = await correct_approvals(patient_id, verified_bill)
 
-    bill_items = await correct_approvals(patient_id, bill_items)
-    tool_context.state["claim:rule_engine_output"] = bill_items
-    output_formatter_agent_tool = AgentTool(agent=output_formatter_agent)
-    bill_items_verified = await output_formatter_agent_tool.run_async(
+    request = f"""Format the input JSON to markdown table, avoid extra text and explainations
+    JSON: {verified_bill_corrected}
+    """
+    output_formatter_agent_as_tool = AgentTool(agent=output_formatter_agent)
+    bill_items_verified = await output_formatter_agent_as_tool.run_async(
         args={
-            "request": "Format the input json to markdown table, output markdown table only and avoid extra text and explanations"
+            "request": request,
         },
         tool_context=tool_context,
     )

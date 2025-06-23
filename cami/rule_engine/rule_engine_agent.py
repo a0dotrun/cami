@@ -4,9 +4,9 @@ from pydantic import BaseModel, Field
 
 from cami.config import MODEL_GEMINI_2_0_FLASH
 from cami.storage.policies import get_doc_from_policy
-from cami.tools import BillLineItemField
+from cami.tools import BillLineItemField, list_bill_items_as_data
 
-from .db_utils import get_info
+from .db_utils import get_patient_info
 
 
 def format_bill_items(items: list[BillLineItemField]) -> str:
@@ -19,13 +19,16 @@ def format_bill_items(items: list[BillLineItemField]) -> str:
     return "\n".join(output)
 
 
-async def get_instructions(context: ReadonlyContext) -> str:
-    bill_items = context.state.get("claim:bill_items", [])
-    bills = format_bill_items(bill_items)
-
+async def claim_verification_instructions(context: ReadonlyContext) -> str:
     patient_id = context.state.get("user:patient_id")
-    info = await get_info(patient_id)
-    doc = get_doc_from_policy(policy_id=info["policy_id"])
+
+    bills_formatted = "No Bill Items Found"
+    response = await list_bill_items_as_data(patient_id=patient_id)
+    if response.get("status") != "error":
+        bills_formatted = format_bill_items(response["result"])
+
+    patient_info = await get_patient_info(patient_id)
+    policy_document = get_doc_from_policy(policy_id=patient_info["policy_id"])
 
     instruction = f"""
         You are an insurance agent to review the claim for individual bill items and determine their eligibility.
@@ -37,34 +40,36 @@ async def get_instructions(context: ReadonlyContext) -> str:
             1.  **Eligibility Assessment**: For every bill item, first determine its **eligibility**.
             2.  **Mark Eligibility**: If a bill item is eligible, add a boolean field named `is_eligible` and set its value to `true`.
             3.  **Skip Processing**: If the bill item is not eligible or the `remaining_sum_insured`, then update `approved_amount` to 0 and continue to next bill item. 
-            3.  **Calculate Initial Approvable Amount**:
+            4.  **Calculate Initial Approvable Amount**:
                 * **For "Rents" (e.g., Room Rent, ICU Charges)**: If the bill item is categorized as "Rents" and includes the number of days, calculate the `initial_approvable_amount` based on the **per daily limit** (from policy terms) multiplied by the `Hospitalisation Days` (found under `ClaimInfo`).
                 * **For All Other Items**: For all other bill items, the `initial_approvable_amount` is the `claimed_amount`.
-            4.  **Apply Sum Insured Cap**:
+            5.  **Apply Sum Insured Cap**:
                 * Compare the `initial_approvable_amount` (calculated in step 3) with the currently available `sum_insured`.
                 * The `approved_amount` for the current bill item must be the **minimum** of these three values: `claimed_amount`, `initial approvable amount` and `sum_insured`.
-            5. **Apply Co-payment Rules**:
+            6. **Apply Co-payment Rules**:
                 * **Determine Applicable Co-payment Percentage**: Based on the `Policy Type` (e.g., "Cami Lite", "Cami Pro"), `Insured Member's Age`, and `Hospital Type` (e.g., "Network", "Non-Network") (all found under `ClaimInfo` or `PolicyInfo`), identify the total applicable co-payment percentage.
                 * **Calculate Co-payment Amount**: Multiply the `approved_amount` (from step 4) by the `total applicable co-payment percentage`.
                 * **Determine Final Payable Amount**: Subtract the `co-payment amount` from the `approved_amount`. This is the final `approved_amount` for the current bill item.
-            6.  **Update Sum Insured**: After determining the `approved_amount` for the current bill item, **deduct this `approved_amount` from the `sum_insured`** for subsequent bill items. This ensures the `sum_insured` accurately reflects the remaining balance.
+            7.  **Update Sum Insured**: After determining the `approved_amount` for the current bill item, **deduct this `approved_amount` from the `sum_insured`** for subsequent bill items. This ensures the `sum_insured` accurately reflects the remaining balance.
         </RuleEngine>
-        
+
         <BillItems>
-            {bills}
+            {bills_formatted}
         </BillItems>
 
-        **UserInfo**
-        - *Name:* {info.get("user_name")}
-        - *Age:* {info.get("age")}
-        - *Sum Insured:* {info.get("sum_insured")}
-    
-        **ClaimInfo**
-            - *Hospitalisation Days:* {info.get("hospitalisation_days")}
-            - *Hospital Type:* {info.get("hospital_in_network")}
-    
-        <PolicyDocument>            
-            {doc}
+        <UserInfo>
+        - *Name:* {patient_info.get("user_name")}
+        - *Age:* {patient_info.get("age")}
+        - *Sum Insured:* {patient_info.get("sum_insured")}
+        </UserInfo>
+
+        <ClaimInfo>
+            - *Hospitalisation Days:* {patient_info.get("hospitalisation_days")}
+            - *Hospital Type:* {patient_info.get("hospital_in_network")}
+        </ClaimInfo>
+
+        <PolicyDocument>
+            {policy_document}
         </PolicyDocument>
 
         **Output Format:**
@@ -76,10 +81,7 @@ async def get_instructions(context: ReadonlyContext) -> str:
     return instruction
 
 
-# 1. Define your individual Output Pydantic model
 class BillItemValidationOutput(BaseModel):
-    """Represents the validation result for a single bill item."""
-
     name: str = Field(description="Name of the bill item, e.g., 'Dialysis', 'Room Rent'")
     claimed_amount: float = Field(description="The amount claimed for this bill item.")
     approved_amount: float = Field(
@@ -93,19 +95,13 @@ class BillItemValidationOutput(BaseModel):
     )
 
 
-class BillItems(BaseModel):
-    """Represents a list of BillItemValidationOutput."""
-
-    bill_items: list[BillItemValidationOutput] = Field(
-        description="List of BillItemValidationOutput."
-    )
+class VerifiedBill(BaseModel):
+    bill_items: list[BillItemValidationOutput] = Field(description="List of verified bill items")
 
 
-rule_engine_agent = Agent(
-    name="rule_engine_agent",
-    description="A helpful agent, that verifies the claim for individual bill items and determine their eligibility.",
+verify_claim_agent = Agent(
+    name="verify_claim_agent",
     model=MODEL_GEMINI_2_0_FLASH,
-    instruction=get_instructions,
-    output_schema=BillItems,
-    tools=[],
+    instruction=claim_verification_instructions,
+    output_schema=VerifiedBill,
 )

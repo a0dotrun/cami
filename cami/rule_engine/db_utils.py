@@ -1,7 +1,7 @@
 from cami.tools import db
 
 
-async def get_info(patient_id) -> dict:
+async def get_patient_info(patient_id) -> dict:
     user_ref = db.collection("users").document(patient_id)
     user_doc = await user_ref.get()
 

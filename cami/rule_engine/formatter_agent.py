@@ -14,7 +14,6 @@ def formatter_agent_instructions(context: ReadonlyContext) -> str:
         <Input>
             {rule_engine_output}
         </Input>
-        
         Your output should be *only* the Markdown table
         **Do not include any additional text or explanations (eg: Do you have any questions about the claim?)**
     """
@@ -24,9 +23,7 @@ def formatter_agent_instructions(context: ReadonlyContext) -> str:
 
 
 output_formatter_agent = Agent(
-    name="review_agent",
-    description="You are a formatter agent, that takes JSON input and outputs only markdown table of claims",
+    name="output_formatter_agent",
     model=MODEL_GEMINI_2_0_FLASH,
     instruction=formatter_agent_instructions,
-    tools=[],
 )
