@@ -1,9 +1,9 @@
-import json
-
 from google.adk.tools.agent_tool import AgentTool
 from google.adk.tools.tool_context import ToolContext
 
 from cami.tools import BillLineItemField, list_bill_items_as_data
+from .rule_engine_agent import rule_engine_agent
+from .formatter_agent import output_formatter_agent
 
 
 def correct_approvals(bill_items):
@@ -24,49 +24,35 @@ def correct_approvals(bill_items):
 
 async def bill_report_tool(patient_id: str, tool_context: ToolContext) -> str:
     """Verify the bill items claim against the policy document.
+    Args:
+        patient_id (str): Patient ID
 
     Returns:
         str: Markdown formatted bill items report for user review
     """
-    from .agents import output_formatter_agent, rule_engine_agent
 
-    # print("Claim: {}".format(claim))
-    # bill_items = claim.get("bill_items", [])
-    # tool_context.state["claim:bill_items"] = bill_items
+    response = await list_bill_items_as_data(patient_id=patient_id)
+    print("Response from list_bill_items_as_data ", response)
+    if response.get("status") != "success":
+        return f"Error fetching bill items report"
 
-    claim: list[BillLineItemField] = await list_bill_items_as_data(patient_id=patient_id)
-
-    rule_engine_agent = AgentTool(agent=rule_engine_agent)
-    result = await rule_engine_agent.run_async(
-        args={"request": "claims from user"},  # Todo: What should we send?
+    bill_items = response["result"]
+    tool_context.state["claim:bill_items"] = bill_items
+    rule_engine_agent_tool = AgentTool(agent=rule_engine_agent)
+    result = await rule_engine_agent_tool.run_async(
+        args={"request": "claims from user"},
         tool_context=tool_context,
     )
-    bill_items = correct_approvals(json.loads(result.replace("\n", "").strip("```").strip("json")))
-    tool_context.state["claim:rule_engine_output"] = bill_items
+    print("Result from rule_engine_agent_tool ", result)
+    bill_items = result["bill_items"]
 
-    review_agent_tool = AgentTool(agent=output_formatter_agent)
-    result = await review_agent_tool.run_async(
+    bill_items = correct_approvals(bill_items)
+    tool_context.state["claim:rule_engine_output"] = bill_items
+    output_formatter_agent_tool = AgentTool(agent=output_formatter_agent)
+    result = await output_formatter_agent_tool.run_async(
         args={
             "request": "reviewing claims and approvals from the rule_engine_agent"
-        },  # Todo: What should we send?
+        },
         tool_context=tool_context,
     )
-
-
-#     Returns:
-#         str: Markdown formatted bill items report for user review
-#     """
-#     bill_items = claim.get("bill_items", [])
-#     tool_context.state["claim:bill_items"] = bill_items
-#     agent_tool = AgentTool(agent=bill_eligibility_agent)
-#     result = await agent_tool.run_async(
-#         args={"request": "claims from user"},  # Todo: What should we send?
-#         tool_context=tool_context,
-#     )
-#     cleaned_result = result.replace("\n", "").strip("```").strip("json")
-#     cleaned_result = json.loads(cleaned_result)
-#     print("Cleaned Result from AgentTool ", cleaned_result)
-
-#     formatted_response = response_formatter(cleaned_result)
-#     print("Formatted Response:", formatted_response)
-#     return formatted_response
+    return result

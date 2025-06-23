@@ -1,14 +1,13 @@
 from pathlib import Path
+from typing import List
 
+from google.adk.agents import Agent, LlmAgent
 from google.adk.agents.readonly_context import ReadonlyContext
+from pydantic import BaseModel, Field
+from pydantic_core.core_schema import ListSchema
 
+from cami.config import MODEL_GEMINI_2_0_FLASH
 from cami.tools import BillLineItemField, list_bill_items_as_data
-
-
-class SafeDict(dict):
-    def __missing__(self, key):
-        """Return a placeholder for missing keys."""
-        return f"{{{key}}}"  # Keeps the placeholder unchanged
 
 
 def format_bill_items(items: list[BillLineItemField]) -> str:
@@ -21,16 +20,9 @@ def format_bill_items(items: list[BillLineItemField]) -> str:
     return "\n".join(output)
 
 
-async def prcess_claim_instructions(context: ReadonlyContext) -> str:
-    patient_id = context.state.get("user:patient_id", "")
-
-    bills = ""
-
-    response = await list_bill_items_as_data(patient_id=patient_id)
-    if response.get("status") == "success":
-        bills = format_bill_items(response["result"])
-    else:
-        bills = "Error fetching bills"
+async def get_instructions(context: ReadonlyContext) -> str:
+    bill_items = context.state.get("claim:bill_items", [])
+    bills = format_bill_items(bill_items)
 
     print("****************** BILLS FROM DB *****************")
     print(f":{bills}")
@@ -75,35 +67,36 @@ async def prcess_claim_instructions(context: ReadonlyContext) -> str:
             * The entire response must start with `[` and end with `]`. No extra text or Markdown code block delimiters (` ```json`, ` ``` `) are allowed.
         """
 
-    total_claim_amount = 0
-    for item in bills:
-        total_claim_amount += item.get("amount", 0)
-        print(f"Total claim amount: {total_claim_amount}")
-
-    instruction = instruction.replace("{total_claim_amount}", str(total_claim_amount)).replace(
-        "{hospitalisation_days}", str(3)
-    )
-
+    instruction = instruction.replace("{hospitalisation_days}", str(3))
     print(f"Prepared Policy Doc: {instruction}")
     return instruction
 
 
-def formatter_agent_instructions(context: ReadonlyContext) -> str:
-    rule_engine_output = context.state.get("claim:rule_engine_output", [])
 
-    instruction = f"""
-        You are a Markdown table formatter. Your task is to convert the provided array of items into a well-formatted Markdown table.
-        The table must include a header row derived from the keys of the items, and each item should be a row in the table.
-        Ensure all values are presented clearly.
-        Your output should be *only* the Markdown table, with no additional text, explanations, or code block delimiters (e.g., ```).
-
-        You are an insurance agent to review the claim for individual bill items and determine their eligibility.
-        Use the Review as the algorithm to review the claims
-
-        <Input>
-            {rule_engine_output}
-        </Input>
+# 1. Define your individual Output Pydantic model
+class BillItemValidationOutput(BaseModel):
     """
+    Represents the validation result for a single bill item.
+    """
+    name: str = Field(description="Name of the bill item, e.g., 'Dialysis', 'Room Rent'")
+    claimed_amount: float = Field(description="The amount claimed for this bill item.")
+    approved_amount: float = Field(description="The final approved amount for this bill item after all policy rules and sum insured limits.")
+    is_eligible: bool = Field(description="True if the bill item is eligible according to policy rules, False otherwise.")
+    reason: str = Field(description="A concise explanation for the approved amount, including why it was capped or denied.")
 
-    print(f"Markdown instruction of approvals: {instruction}")
-    return instruction
+
+class BillItems(BaseModel):
+    """
+    Represents a list of BillItemValidationOutput.
+    """
+    bill_items: List[BillItemValidationOutput] = Field(description="List of BillItemValidationOutput.")
+
+
+rule_engine_agent = Agent(
+    name="rule_engine_agent",
+    description="A helpful insurance agent, that verifies the claim for individual bill items and determine their eligibility.",
+    model=MODEL_GEMINI_2_0_FLASH,
+    instruction=get_instructions,
+    output_schema=BillItems,
+    tools=[],
+)
