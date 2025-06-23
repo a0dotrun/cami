@@ -1,13 +1,11 @@
-from pathlib import Path
-from typing import List
-
 from google.adk.agents import Agent
 from google.adk.agents.readonly_context import ReadonlyContext
 from pydantic import BaseModel, Field
 
-from cami.tools import BillLineItemField
 from cami.config import MODEL_GEMINI_2_0_FLASH
 from cami.storage.policies import get_doc_from_policy
+from cami.tools import BillLineItemField
+
 from .db_utils import get_info
 
 
@@ -78,24 +76,29 @@ async def get_instructions(context: ReadonlyContext) -> str:
     return instruction
 
 
-
 # 1. Define your individual Output Pydantic model
 class BillItemValidationOutput(BaseModel):
-    """
-    Represents the validation result for a single bill item.
-    """
+    """Represents the validation result for a single bill item."""
+
     name: str = Field(description="Name of the bill item, e.g., 'Dialysis', 'Room Rent'")
     claimed_amount: float = Field(description="The amount claimed for this bill item.")
-    approved_amount: float = Field(description="The final approved amount for this bill item after all policy rules and sum insured limits.")
-    is_eligible: bool = Field(description="True if the bill item is eligible according to policy rules, False otherwise.")
-    reason: str = Field(description="A concise explanation for the approved amount, including why it was capped or denied.")
+    approved_amount: float = Field(
+        description="The final approved amount for this bill item after all policy rules and sum insured limits."
+    )
+    is_eligible: bool = Field(
+        description="True if the bill item is eligible according to policy rules, False otherwise."
+    )
+    reason: str = Field(
+        description="A concise explanation for the approved amount, including why it was capped or denied."
+    )
 
 
 class BillItems(BaseModel):
-    """
-    Represents a list of BillItemValidationOutput.
-    """
-    bill_items: List[BillItemValidationOutput] = Field(description="List of BillItemValidationOutput.")
+    """Represents a list of BillItemValidationOutput."""
+
+    bill_items: list[BillItemValidationOutput] = Field(
+        description="List of BillItemValidationOutput."
+    )
 
 
 rule_engine_agent = Agent(
