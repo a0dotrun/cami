@@ -9,14 +9,16 @@ def formatter_agent_instructions(context: ReadonlyContext) -> str:
 
     instruction = f"""
         You are a Markdown table formatter. Your task is to convert the provided array of items into a well-formatted Markdown table.
-        The table must include a header row derived from the keys of the items, and each item should be a row in the table.
-        Ensure all values are presented clearly.
+
+        **Your output must contain ONLY the Markdown table and absolutely no other text, explanations, or conversational filler.**
+        
+        The table must include a header row derived from the keys of the items, and each item should be a row in the table. Ensure all values are presented clearly.
+        
+        **Do not include any additional text, introductory sentences, concluding remarks, or explanations whatsoever (e.g., "Here is a summary...", "Please review the details...", "Do you have any questions about the claim?").**
+        
         <Input>
             {rule_engine_output}
         </Input>
-        
-        Your output should be *only* the Markdown table
-        **Do not include any additional text or explanations (eg: Do you have any questions about the claim?)**
     """
 
     print(f"Markdown instruction of approvals: {instruction}")
