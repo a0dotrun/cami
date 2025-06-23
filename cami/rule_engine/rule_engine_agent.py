@@ -32,12 +32,19 @@ async def get_info(patient_id) -> dict:
     print("Policies Document:", policies_doc)
     print("Claims Document:", claims_doc)
 
+    try:
+        h_days = int(claims_doc.get("discharge_report").get("hospitalization_days", {}).get("value", 0)),
+    except Exception as e:
+        print("Error getting hospitalisation days ", e)
+        h_days = 3  # Default
+
     return {
         "user_name": f"{user_doc.get('first_name')} {user_doc.get('last_name')}",
         "policy_id": f"{policies_doc.get('policy_id')}",
         "age": claims_doc.get("discharge_report").get("age", {}).get("value", 0),
-        "hospitalisation_days": int(claims_doc.get("discharge_report").get("hospitalization_days", {}).get("value", 0)),
-        "sum_insured": 500000
+        "hospitalisation_days": h_days,
+        "sum_insured": 500000,  # Todo: Change the hardcoded values
+        "hospital_in_network": False
     }
 
 
@@ -85,6 +92,7 @@ async def get_instructions(context: ReadonlyContext) -> str:
         
             **ClaimInfo**
                 - *Hospitalisation Days:* {info.get("hospitalisation_days")}
+                - *Hospital In Network:* {info.get("hospital_in_network")}
         
             <PolicyDocument>            
                 {doc}
