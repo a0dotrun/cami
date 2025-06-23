@@ -8,7 +8,7 @@ def get_doc_from_policy(policy_id: str) -> str:
     with open(Path.cwd() / "cami/storage/cami-lite.md") as file:
         CAMI_LITE_POLICY = file.read()
 
-    with open(Path.cwd() / "cami/storage/cami-pro-policy.md") as file:
+    with open(Path.cwd() / "cami/storage/cami-pro.md") as file:
         CAMI_PRO_POLICY = file.read()
 
     docs = {
