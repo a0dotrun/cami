@@ -1,9 +1,10 @@
 from google.adk.tools.agent_tool import AgentTool
 from google.adk.tools.tool_context import ToolContext
 
-from cami.tools import BillLineItemField, list_bill_items_as_data
-from .rule_engine_agent import rule_engine_agent
+from cami.tools import list_bill_items_as_data
+
 from .formatter_agent import output_formatter_agent
+from .rule_engine_agent import rule_engine_agent
 
 
 def correct_approvals(bill_items):
@@ -24,17 +25,17 @@ def correct_approvals(bill_items):
 
 async def bill_report_tool(patient_id: str, tool_context: ToolContext) -> str:
     """Verify the bill items claim against the policy document.
+
     Args:
         patient_id (str): Patient ID
 
     Returns:
         str: Markdown formatted bill items report for user review
     """
-
     response = await list_bill_items_as_data(patient_id=patient_id)
     print("Response from list_bill_items_as_data ", response)
     if response.get("status") != "success":
-        return f"Error fetching bill items report"
+        return "Error fetching bill items report"
 
     bill_items = response["result"]
     tool_context.state["claim:bill_items"] = bill_items
@@ -50,9 +51,7 @@ async def bill_report_tool(patient_id: str, tool_context: ToolContext) -> str:
     tool_context.state["claim:rule_engine_output"] = bill_items
     output_formatter_agent_tool = AgentTool(agent=output_formatter_agent)
     result = await output_formatter_agent_tool.run_async(
-        args={
-            "request": "reviewing claims and approvals from the rule_engine_agent"
-        },
+        args={"request": "reviewing claims and approvals from the rule_engine_agent"},
         tool_context=tool_context,
     )
     return result
