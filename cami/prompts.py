@@ -39,7 +39,7 @@ def claim_agent_instructions(context: ReadonlyContext) -> str:
         - start by checking discharge report status, transfer to discharge agent to complete the report.
         - start by checking the bill report status, transfer to bill agent to complete the report.
     6. Verify that all the pending reports are completed.
-    7. Ask the customer if they would like to start the claim process, use the tool verify_claim_tool
+    7. Ask the customer if they would like to start the claim process, use the tool process_claim
     8. Display the results in a friendly way.
 
     If the customer asks anything else, transfer back to the triage agent.
