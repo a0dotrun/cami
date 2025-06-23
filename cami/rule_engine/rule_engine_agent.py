@@ -39,16 +39,16 @@ async def claim_verification_instructions(context: ReadonlyContext) -> str:
 
             1.  **Eligibility Assessment**: For every bill item, first determine its **eligibility**.
             2.  **Mark Eligibility**: If a bill item is eligible, add a boolean field named `is_eligible` and set its value to `true`.
-            3.  **Skip Processing**: If the bill item is not eligible or the `remaining_sum_insured`, then update `approved_amount` to 0 and continue to next bill item. 
+            3.  **Skip Processing**: If the bill item is not eligible or the `remaining_sum_insured` is 0, then update `approved_amount` to 0 and continue to next bill item. 
             4.  **Calculate Initial Approvable Amount**:
                 * **For "Rents" (e.g., Room Rent, ICU Charges)**: If the bill item is categorized as "Rents" and includes the number of days, calculate the `initial_approvable_amount` based on the **per daily limit** (from policy terms) multiplied by the `Hospitalisation Days` (found under `ClaimInfo`).
                 * **For All Other Items**: For all other bill items, the `initial_approvable_amount` is the `claimed_amount`.
             5.  **Apply Sum Insured Cap**:
-                * Compare the `initial_approvable_amount` (calculated in step 3) with the currently available `sum_insured`.
+                * Compare the `initial_approvable_amount` (calculated in step 4) with the currently available `sum_insured`.
                 * The `approved_amount` for the current bill item must be the **minimum** of these three values: `claimed_amount`, `initial approvable amount` and `sum_insured`.
             6. **Apply Co-payment Rules**:
                 * **Determine Applicable Co-payment Percentage**: Based on the `Policy Type` (e.g., "Cami Lite", "Cami Pro"), `Insured Member's Age`, and `Hospital Type` (e.g., "Network", "Non-Network") (all found under `ClaimInfo` or `PolicyInfo`), identify the total applicable co-payment percentage.
-                * **Calculate Co-payment Amount**: Multiply the `approved_amount` (from step 4) by the `total applicable co-payment percentage`.
+                * **Calculate Co-payment Amount**: Multiply the `approved_amount` (from step 5) by the `total applicable co-payment percentage`.
                 * **Determine Final Payable Amount**: Subtract the `co-payment amount` from the `approved_amount`. This is the final `approved_amount` for the current bill item.
             7.  **Update Sum Insured**: After determining the `approved_amount` for the current bill item, **deduct this `approved_amount` from the `sum_insured`** for subsequent bill items. This ensures the `sum_insured` accurately reflects the remaining balance.
         </RuleEngine>
@@ -84,8 +84,7 @@ async def claim_verification_instructions(context: ReadonlyContext) -> str:
 class BillItemValidationOutput(BaseModel):
     name: str = Field(description="Name of the bill item, e.g., 'Dialysis', 'Room Rent'")
     claimed_amount: float = Field(description="The amount claimed for this bill item.")
-    approved_amount: float = Field(
-        description="The final approved amount for this bill item after all policy rules and sum insured limits."
+    approved_amount: float = Field(description="The final approved amount for this bill item after all policy rules and sum insured limits."
     )
     is_eligible: bool = Field(
         description="True if the bill item is eligible according to policy rules, False otherwise."
