@@ -103,8 +103,8 @@
 -   **Details:** `A mandatory co-payment is applicable on each and every admissible claim amount for Cami Lite policyholders, as per the age of the insured member at the time of hospitalization.`
 -   **Co-payment Structure by Age and Hospital Type:**
     -   **Network Hospital:**
-        -   `Up to 60 years:` **0%** co-payment
-        -   `61 to 70 years:` **10%** co-payment
+        -   `Up to 60 years:` **10%** co-payment
+        -   `61 to 70 years:` **15%** co-payment
         -   `71 years and above:` **20%** co-payment
     -   **Non-Network Hospital:**
         -   `All ages:` **25%** co-payment
