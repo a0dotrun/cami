@@ -71,6 +71,7 @@ ignore = [
     "PLR0913", # too many arguments
     "PLR0915", # too many statements
     "S101",   # use of assert
+    "S104",
 ]
 
 # Exclude a variety of commonly ignored directories.

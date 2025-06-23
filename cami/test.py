@@ -1,18 +1,17 @@
 import asyncio
+
 from google.adk.agents import LlmAgent
 from google.adk.cli.cli import run_input_file
-from google.adk.runners import InMemoryRunner, InvocationContext
-from google.adk.runners import Runner
+from google.adk.runners import InMemoryRunner, InvocationContext, Runner
 from google.adk.sessions import InMemorySessionService
 from google.adk.tools import ToolContext
 from google.genai import types
 
-
 from cami.rule_engine import rule_engine_tool
 
-APP_NAME="summary_agent"
-USER_ID="user1234"
-SESSION_ID="1234"
+APP_NAME = "summary_agent"
+USER_ID = "user1234"
+SESSION_ID = "1234"
 claim = {
     "patient": "Kireeti",
     "hospital": "Jupiter Hospital and Institute of Vascular Surgery, No.28, 7th Main, 9th Cross, Malleswaram, Bangalore, 560003",
@@ -23,7 +22,7 @@ claim = {
         {"name": "Injections", "amount": 6000},
         {"name": "Blood Work", "amount": 7800},
         {"name": "Nose Surgery", "amount": 34500},
-    ]
+    ],
 }
 
 # --- 2. Initialize your LlmAgent ---
@@ -32,7 +31,7 @@ my_agent = LlmAgent(
     name="PolicyExpertAgent",
     instruction="You are a helpful policy expert. You will take bill items from the user and use the appropriate tools to verify the claim",
     model="gemini-2.0-flash",  # Ensure this matches your desired LLM model,
-    tools=[rule_engine_tool]
+    tools=[rule_engine_tool],
 )
 
 # Session and Runner
@@ -48,8 +47,9 @@ user_query = "What is the coverage for dialysis and what about room rent?"
 # Create a ToolContext instance and set the policy ID
 # initial_tool_context = ToolContext()
 
+
 def call_agent(query):
-    content = types.Content(role='user', parts=[types.Part(text=query)])
+    content = types.Content(role="user", parts=[types.Part(text=query)])
     events = runner.run(user_id=USER_ID, session_id=SESSION_ID, new_message=content)
 
     for event in events:
