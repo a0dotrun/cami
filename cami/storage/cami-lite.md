@@ -95,3 +95,18 @@
   - Type: `annual_limit`
   - Limit: `₹50,000 per policy year`
   - Description: `Cap on inpatient treatment under Ayurveda, Yoga, Unani, Siddha, and Homeopathy`
+
+---
+
+## 5. Co-payment:
+
+-   **Details:** `A mandatory co-payment is applicable on each and every admissible claim amount for Cami Lite policyholders, as per the age of the insured member at the time of hospitalization.`
+-   **Co-payment Structure by Age and Hospital Type:**
+    -   **Network Hospital:**
+        -   `Up to 60 years:` **0%** co-payment
+        -   `61 to 70 years:` **10%** co-payment
+        -   `71 years and above:` **20%** co-payment
+    -   **Non-Network Hospital:**
+        -   `All ages:` **25%** co-payment
+-   **Additive Nature:** `In instances where multiple co-payment conditions apply to a single claim (e.g., age-based co-payment, and a co-payment for treatment at a non-network hospital, if applicable as per other policy clauses), **the applicable co-payment percentages will be added together**. The agent is responsible for summing all applicable co-payments.`
+-   **Application:** `The policyholder will bear the total calculated co-payment percentage of the approved claim amount, and the insurer will pay the remaining balance.`
