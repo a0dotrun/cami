@@ -12,7 +12,7 @@ def correct_approvals(bill_items):
     for item in bill_items:
         print(f"Item: {item}")
         if item["is_eligible"]:
-            approvable_amount = min(sum_insured, item["approved_amount"])
+            approvable_amount = min(sum_insured, item["approved_amount"], item["claimed_amount"])
             item["approved_amount"] = approvable_amount
             sum_insured -= approvable_amount
         else:

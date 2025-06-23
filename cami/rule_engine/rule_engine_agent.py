@@ -61,7 +61,7 @@ async def get_instructions(context: ReadonlyContext) -> str:
             1.  **Eligibility Assessment**: For every bill item, first determine its **eligibility**.
             2.  **Mark Eligibility**: If a bill item is eligible, add a boolean field named `is_eligible` and set its value to `true`.
             3.  **Calculate Initial Approvable Amount**:
-                * **For Rents (e.g., Room Rent, ICU Charges)**: If the bill item is categorized as "Rents," calculate the initial approvable amount based on the **per daily limit** for each day claimed. You can find total days hospitalised days under ClaimInfo -- Hospitalisation Days
+                * **For "Rents" (e.g., Room Rent, ICU Charges)**: If the bill item is categorized as "Rents" and includes the number of days, calculate the approvable amount based on the **per daily limit** (from policy terms) multiplied by the `Hospitalisation Days` (found under `ClaimInfo`). This result is your `policy_capped_amount`.
                 * **For All Other Items**: For all other bill items, the initial approvable amount is the `claimed_amount`.
             4.  **Apply Sum Insured Cap**:
                 * Compare the `initial approvable amount` (calculated in step 3) with the currently available `sum_insured`.
@@ -70,16 +70,6 @@ async def get_instructions(context: ReadonlyContext) -> str:
             6.  **Update Sum Insured**: After determining the `approved_amount` for the current bill item, **deduct this `approved_amount` from the `sum_insured`** for subsequent bill items. This ensures the `sum_insured` accurately reflects the remaining balance.
         </RuleEngine>
         
-        <UserInfo>
-            - Name: {info.get("user_name")}
-            - Age: {info.get("age")}
-            - Sum Insured: {info.get("sum_insured")}
-        </UserInfo>
-        
-        <ClaimInfo>
-            - Hospitalisation Days: {info.get("hospitalisation_days")}
-        </ClaimInfo>
-    
         <BillItems>
             {bills}
         </BillItems>
@@ -87,6 +77,15 @@ async def get_instructions(context: ReadonlyContext) -> str:
     with open(policy_doc_path) as f:
         doc = f.read()
         instruction += f"""
+        
+            **UserInfo**
+            - *Name:* {info.get("user_name")}
+            - *Age:* {info.get("age")}
+            - *Sum Insured:* {info.get("sum_insured")}
+        
+            **ClaimInfo**
+                - *Hospitalisation Days:* {info.get("hospitalisation_days")}
+        
             <PolicyDocument>            
                 {doc}
             </PolicyDocument>
