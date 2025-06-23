@@ -1,21 +1,5 @@
-import json
-
 from google.adk.tools.tool_context import ToolContext
 from google.adk.tools.agent_tool import AgentTool
-
-from .engine import RuleEngine
-
-
-def response_formatter(bill_items):
-    response = ""
-    for item in bill_items:
-        response += f"""
-            **{item['name']}** 
-            Claimed Amount: {item['claimed_amount']}
-            Approved Amount: {item['approved_amount']}
-            Reason: {item['reason']}
-        """
-    return response
 
 
 async def bill_report_tool(claim: dict, tool_context: ToolContext) -> str:
@@ -28,19 +12,21 @@ async def bill_report_tool(claim: dict, tool_context: ToolContext) -> str:
     Returns:
         str: Markdown formatted bill items report for user review
     """
-    from .agents import bill_eligibility_agent
+    from .agents import rule_engine_agent, review_agent
 
     bill_items = claim.get('bill_items', [])
     tool_context.state["claim:bill_items"] = bill_items
-    agent_tool = AgentTool(agent=bill_eligibility_agent)
-    result = await agent_tool.run_async(
+    rule_engine_agent = AgentTool(agent=rule_engine_agent)
+    result = await rule_engine_agent.run_async(
         args={"request": "claims from user"},  # Todo: What should we send?
         tool_context=tool_context
     )
-    cleaned_result = result.replace("\n", "").strip("```").strip("json")
-    cleaned_result = json.loads(cleaned_result)
-    print('Cleaned Result from AgentTool ', cleaned_result)
+    tool_context.state["claim:rule_engine_output"] = result
+    review_agent_tool = AgentTool(agent=review_agent)
+    result = await review_agent_tool.run_async(
+        args={"request": "reviewing claims and approvals from the rule_engine_agent"},  # Todo: What should we send?
+        tool_context=tool_context
+    )
 
-    formatted_response = response_formatter(cleaned_result)
-    print("Formatted Response:", formatted_response)
-    return formatted_response
+    print('Result from AgentTool ', result)
+    return result

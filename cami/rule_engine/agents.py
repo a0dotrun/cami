@@ -5,16 +5,24 @@ from google.adk.agents import LlmAgent
 from google.adk.agents.readonly_context import ReadonlyContext
 from pydantic import BaseModel
 
-from cami.config import MODEL_GEMINI_2_0_FLASH
-from .prompts import bill_eligibility_agent_instructions
+from cami.config import MODEL_GEMINI_2_0_FLASH, MODEL_GEMINI_2_0_PRO
+from .prompts import rule_engine_agent_instructions, review_agent_instructions
 from . import bill_report_tool
 
 
-bill_eligibility_agent = Agent(
-    name="claim_agent",
+rule_engine_agent = Agent(
+    name="rule_engine_agent",
     description="A helpful insurance agent, that verifies the claim for individual bill items and determine their eligibility.",
     model=MODEL_GEMINI_2_0_FLASH,
-    instruction=bill_eligibility_agent_instructions,
+    instruction=rule_engine_agent_instructions,
+    tools=[]
+)
+
+review_agent = Agent(
+    name="review_agent",
+    description="A helpful insurance agent, that reviews the processed claims from the other agent and makes necessary corrections",
+    model=MODEL_GEMINI_2_0_FLASH,
+    instruction=review_agent_instructions,
     tools=[]
 )
 
