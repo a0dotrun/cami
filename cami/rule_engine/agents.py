@@ -1,8 +1,30 @@
-# from google.adk.agents import Agent
+from google.adk.agents import Agent, LlmAgent
+from google.adk.agents.readonly_context import ReadonlyContext
+from google.adk.tools.base_tool import BaseTool
+from google.adk.tools.tool_context import ToolContext
+from pydantic import BaseModel
 
-# from cami.config import MODEL_GEMINI_2_0_FLASH
+from cami.config import MODEL_GEMINI_2_0_FLASH
 
-# from .prompts import bill_eligibility_agent_instructions
+from .prompts import formatter_agent_instructions, rule_engine_agent_instructions
+
+rule_engine_agent = Agent(
+    name="rule_engine_agent",
+    description="A helpful insurance agent, that verifies the claim for individual bill items and determine their eligibility.",
+    model=MODEL_GEMINI_2_0_FLASH,
+    instruction=rule_engine_agent_instructions,
+    output_schema="",
+    output_key="",
+    tools=[],
+)
+
+output_formatter_agent = Agent(
+    name="review_agent",
+    description="A helpful insurance agent, that reviews the processed claims from the other agent and makes necessary corrections",
+    model=MODEL_GEMINI_2_0_FLASH,
+    instruction=formatter_agent_instructions,
+    tools=[],
+)
 
 
 # def bill_report_agent_instructions(context: ReadonlyContext) -> str:
@@ -16,11 +38,14 @@
 #     If the customer asks anything else, transfer back to the triage agent.
 #     """
 
+# BILL_REPORT_INSTRUCTION = """
+#     You are a helpful policy expert. You will take bill items from the user and use the appropriate tools to verify the claim. Pass the response from the tool unchanged
+# """
 
 # bill_report_agent = LlmAgent(
 #     name="PolicyExpertAgent",
 #     description="You are a helpful policy expert. You will take bill items from the user and use `rule_engine_tool` tool to verify the claim",
 #     instruction=bill_report_agent_instructions,
 #     model="gemini-2.0-flash",  # Ensure this matches your desired LLM model,
-#     tools=[bill_report_tool],
+#     tools=[bill_report_tool]
 # )

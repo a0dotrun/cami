@@ -62,7 +62,7 @@ async def prcess_claim_instructions(context: ReadonlyContext) -> str:
             {bills}
         </BillItems>
     """
-    with policy_doc_path.open() as f:
+    with open(policy_doc_path) as f:
         doc = f.read()
         instruction += f"""
             <PolicyDocument>
@@ -70,25 +70,40 @@ async def prcess_claim_instructions(context: ReadonlyContext) -> str:
             </PolicyDocument>
             -----
 
-            Generate a **JSON array** of bill items. Each object in the array must contain only the following five fields:
-            - `name`
-            - `claimed_amount`
-            - `approved_amount`
-            - `reason`
-
-            Your entire response must be **pure JSON**, starting with `[` and ending with `]`. Do not include any additional text, explanations, or Markdown code block delimiters (e.g., ` ```json` or ` ``` `).
+            **Output Format:**
+            * The final response must be a **pure JSON array** of bill items. Each object in the array must contain only the following five fields: `name`, `claimed_amount`, `approved_amount`, `is_eligible`, and `reason`.
+            * The entire response must start with `[` and end with `]`. No extra text or Markdown code block delimiters (` ```json`, ` ``` `) are allowed.
         """
 
-    # total_claim_amount = 0
-    # for item in response:
-    #     total_claim_amount += item.get("amount", 0)
-    #     print(f"Total claim amount: {total_claim_amount}")
+    total_claim_amount = 0
+    for item in bills:
+        total_claim_amount += item.get("amount", 0)
+        print(f"Total claim amount: {total_claim_amount}")
 
-    # instruction = instruction.replace("{total_claim_amount}", str(total_claim_amount)).replace(
-    #     "{hospitalisation_days}", str(3)
-    # )
+    instruction = instruction.replace("{total_claim_amount}", str(total_claim_amount)).replace(
+        "{hospitalisation_days}", str(3)
+    )
 
-    print("****************** INSTRUCTIONS *****************")
-    print(f"Prepared Instructions: {instruction}")
-    print("****************** INSTRUCTIONS *****************")
+    print(f"Prepared Policy Doc: {instruction}")
+    return instruction
+
+
+def formatter_agent_instructions(context: ReadonlyContext) -> str:
+    rule_engine_output = context.state.get("claim:rule_engine_output", [])
+
+    instruction = f"""
+        You are a Markdown table formatter. Your task is to convert the provided array of items into a well-formatted Markdown table.
+        The table must include a header row derived from the keys of the items, and each item should be a row in the table.
+        Ensure all values are presented clearly.
+        Your output should be *only* the Markdown table, with no additional text, explanations, or code block delimiters (e.g., ```).
+
+        You are an insurance agent to review the claim for individual bill items and determine their eligibility.
+        Use the Review as the algorithm to review the claims
+
+        <Input>
+            {rule_engine_output}
+        </Input>
+    """
+
+    print(f"Markdown instruction of approvals: {instruction}")
     return instruction
