@@ -1,12 +1,11 @@
 from pathlib import Path
-from typing import List
 
 from google.adk.agents import Agent
 from google.adk.agents.readonly_context import ReadonlyContext
 from pydantic import BaseModel, Field
 
-from cami.tools import BillLineItemField, db
 from cami.config import MODEL_GEMINI_2_0_FLASH
+from cami.tools import BillLineItemField, db
 
 
 def format_bill_items(items: list[BillLineItemField]) -> str:
@@ -17,6 +16,7 @@ def format_bill_items(items: list[BillLineItemField]) -> str:
         output.append(f" - charges: {item.charges}")
         output.append("</item>")
     return "\n".join(output)
+
 
 async def get_info(patient_id) -> dict:
     user_ref = db.collection("users").document(patient_id)
@@ -33,7 +33,9 @@ async def get_info(patient_id) -> dict:
     print("Claims Document:", claims_doc)
 
     try:
-        h_days = int(claims_doc.get("discharge_report").get("hospitalization_days", {}).get("value", 0)),
+        h_days = (
+            int(claims_doc.get("discharge_report").get("hospitalization_days", {}).get("value", 0)),
+        )
     except Exception as e:
         print("Error getting hospitalisation days ", e)
         h_days = 3  # Default
@@ -44,7 +46,7 @@ async def get_info(patient_id) -> dict:
         "age": claims_doc.get("discharge_report").get("age", {}).get("value", 0),
         "hospitalisation_days": h_days,
         "sum_insured": 500000,  # Todo: Change the hardcoded values
-        "hospital_in_network": False
+        "hospital_in_network": False,
     }
 
 
@@ -107,24 +109,29 @@ async def get_instructions(context: ReadonlyContext) -> str:
     return instruction
 
 
-
 # 1. Define your individual Output Pydantic model
 class BillItemValidationOutput(BaseModel):
-    """
-    Represents the validation result for a single bill item.
-    """
+    """Represents the validation result for a single bill item."""
+
     name: str = Field(description="Name of the bill item, e.g., 'Dialysis', 'Room Rent'")
     claimed_amount: float = Field(description="The amount claimed for this bill item.")
-    approved_amount: float = Field(description="The final approved amount for this bill item after all policy rules and sum insured limits.")
-    is_eligible: bool = Field(description="True if the bill item is eligible according to policy rules, False otherwise.")
-    reason: str = Field(description="A concise explanation for the approved amount, including why it was capped or denied.")
+    approved_amount: float = Field(
+        description="The final approved amount for this bill item after all policy rules and sum insured limits."
+    )
+    is_eligible: bool = Field(
+        description="True if the bill item is eligible according to policy rules, False otherwise."
+    )
+    reason: str = Field(
+        description="A concise explanation for the approved amount, including why it was capped or denied."
+    )
 
 
 class BillItems(BaseModel):
-    """
-    Represents a list of BillItemValidationOutput.
-    """
-    bill_items: List[BillItemValidationOutput] = Field(description="List of BillItemValidationOutput.")
+    """Represents a list of BillItemValidationOutput."""
+
+    bill_items: list[BillItemValidationOutput] = Field(
+        description="List of BillItemValidationOutput."
+    )
 
 
 rule_engine_agent = Agent(
