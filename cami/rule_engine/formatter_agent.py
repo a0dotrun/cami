@@ -15,7 +15,8 @@ def formatter_agent_instructions(context: ReadonlyContext) -> str:
             {rule_engine_output}
         </Input>
         
-        Your output should be *only* the Markdown table, with no additional text, explanations, or code block delimiters (e.g., ```).
+        Your output should be *only* the Markdown table
+        **Do not include any additional text or explanations (eg: Do you have any questions about the claim?)**
     """
 
     print(f"Markdown instruction of approvals: {instruction}")
@@ -24,7 +25,7 @@ def formatter_agent_instructions(context: ReadonlyContext) -> str:
 
 output_formatter_agent = Agent(
     name="review_agent",
-    description="A helpful insurance agent, that reviews the processed claims from the other agent and makes necessary corrections",
+    description="You are a formatter agent, that takes JSON input and outputs only markdown table of claims",
     model=MODEL_GEMINI_2_0_FLASH,
     instruction=formatter_agent_instructions,
     tools=[],

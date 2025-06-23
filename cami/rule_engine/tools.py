@@ -54,7 +54,7 @@ async def verify_claim_tool(patient_id: str, tool_context: ToolContext) -> str:
     tool_context.state["claim:rule_engine_output"] = bill_items
     output_formatter_agent_tool = AgentTool(agent=output_formatter_agent)
     result = await output_formatter_agent_tool.run_async(
-        args={"request": "reviewing claims and approvals from the rule_engine_agent"},
+        args={"request": "Format the input json to markdown table, output markdown table only and avoid extra text and explanations"},
         tool_context=tool_context,
     )
     return result
