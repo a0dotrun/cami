@@ -40,11 +40,9 @@ def rule_engine_agent_instructions(context: ReadonlyContext) -> str:
             </PolicyDocument>
             -----
             
-            Generate a **Markdown** response of bill items. Containing the following information
-            - `name`
-            - `claimed_amount`
-            - `approved_amount`
-            - `reason`
+            **Output Format:**
+            * The final response must be a **pure JSON array** of bill items. Each object in the array must contain only the following five fields: `name`, `claimed_amount`, `approved_amount`, `is_eligible`, and `reason`.
+            * The entire response must start with `[` and end with `]`. No extra text or Markdown code block delimiters (` ```json`, ` ``` `) are allowed.
         """
 
     total_claim_amount = 0
@@ -60,62 +58,23 @@ def rule_engine_agent_instructions(context: ReadonlyContext) -> str:
     return instruction
 
 
-def review_agent_instructions(context: ReadonlyContext) -> str:
+def formatter_agent_instructions(context: ReadonlyContext) -> str:
     rule_engine_output = context.state.get('claim:rule_engine_output', [])
 
-    policy_doc_path = os.path.join(os.getcwd(), "cami/storage/policy-lite.md")
-    print("Policy Path: {}".format(policy_doc_path))
-
     instruction = f"""
+        You are a Markdown table formatter. Your task is to convert the provided array of items into a well-formatted Markdown table.
+        The table must include a header row derived from the keys of the items, and each item should be a row in the table.
+        Ensure all values are presented clearly.
+        Your output should be *only* the Markdown table, with no additional text, explanations, or code block delimiters (e.g., ```).
+        
         You are an insurance agent to review the claim for individual bill items and determine their eligibility.
         Use the Review as the algorithm to review the claims
         
-        **Policy Context and Rules for Review:**
-        -   Track `remaining_sum_insured` sequentially. This is the absolute cap for any approval.
-        -   **Sub-limits (apply BEFORE SI cap for each item):**
-            -   ICU Charges: Daily limit ₹5,000 (e.g., 5 days * ₹5,000/day = ₹25,000).
-            -   Room Rent: Daily limit ₹3,000 (e.g., 5 days * ₹3,000/day = ₹15,000).
-            -   Ambulance Service: Capped at ₹2,000 per hospitalization.
-            -   Nursing Charges: Daily limit ₹500/day.
-            -   Consultation Charges (Pre/Post-hospitalization): Limit of ₹1,000 per visit.
-            -   Post-hospitalization expenses: Limit of ₹7,000 (this is a total limit, not per-visit).
-
-        <Review>
-            ** Process each item sequentially **
-            1.  **Parse Table**: Extract `Name`, `Claimed Amount`, `Approved Amount`, and `Reason` for each row.
-            2.  **Calculate Expected Approved Amount**:
-                * For the current item, first determine `amount_after_sub_limits`. If `Name` implies a daily or fixed sub-limit (e.g., "ICU Charges", "Room Rent", "Ambulance", "Nursing Charges", "Consultation"), apply that sub-limit. Otherwise, it's the `Claimed Amount`.
-                * Then, compare `amount_after_sub_limits` with the `current_remaining_sum_insured`. The `expected_approved_amount` should be `min(amount_after_sub_limits, current_remaining_sum_insured)`.
-            3.  **Compare and Flag Discrepancy**: Compare the `Approved Amount` from the table with your `expected_approved_amount`. If they differ significantly (e.g., more than a small rounding error), flag a discrepancy.
-            4.  **Sum Insured Depletion**: After calculating the `expected_approved_amount`, deduct it from `current_remaining_sum_insured` for the next item. If `current_remaining_sum_insured` becomes 0 or less, ensure all *subsequent* items in the table have an `Approved Amount` of `0`.
-            5.  **Reason Consistency**: Check if the `Reason` provided in the table is consistent with the `Approved Amount` (e.g., "Sum Insured exhausted" if approved amount is 0 due to SI).
-            6.  **No Over-Claimed**: Ensure `Approved Amount` is never greater than `Claimed Amount`.
-            
-            Upon completing the initial processing, calculate the total Approved Amount across all items; if this sum exceeds the original_sum_insured, you must iteratively re-process the claim to ensure the total Approved Amount is capped by the original_sum_insured. 
-        </Review>
-
-        <ClaimBreakdownToReview>
+        <Input>
             {rule_engine_output}
-        </ClaimBreakdownToReview>
+        </Input>
     """
-    with open(policy_doc_path) as f:
-        doc = f.read()
-        instruction += f"""
-            <PolicyDocument>
-                {doc}
-            </PolicyDocument>
-            -----
 
-            **Output Format:**
-            Generate a **Markdown** response of bill items. Each row should contain only the following info and nothing else
-            - `name`
-            - `claimed_amount`
-            - `approved_amount`
-            - `reason`
-        """
-
-    instruction = instruction.replace("{hospitalisation_days}", str(3))
-
-    print("Prepared Policy Doc: {}".format(instruction))
+    print("Markdown instruction of approvals: {}".format(instruction))
     return instruction
 

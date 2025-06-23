@@ -6,7 +6,7 @@ from google.adk.agents.readonly_context import ReadonlyContext
 from pydantic import BaseModel
 
 from cami.config import MODEL_GEMINI_2_0_FLASH, MODEL_GEMINI_2_0_PRO
-from .prompts import rule_engine_agent_instructions, review_agent_instructions
+from .prompts import rule_engine_agent_instructions, formatter_agent_instructions
 from . import bill_report_tool
 
 
@@ -18,11 +18,11 @@ rule_engine_agent = Agent(
     tools=[]
 )
 
-review_agent = Agent(
+output_formatter_agent = Agent(
     name="review_agent",
     description="A helpful insurance agent, that reviews the processed claims from the other agent and makes necessary corrections",
     model=MODEL_GEMINI_2_0_FLASH,
-    instruction=review_agent_instructions,
+    instruction=formatter_agent_instructions,
     tools=[]
 )
 
