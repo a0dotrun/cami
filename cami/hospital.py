@@ -1,5 +1,3 @@
-
-
 class Hospital:
     name: str
     address: str
