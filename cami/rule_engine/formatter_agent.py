@@ -1,6 +1,4 @@
-from pathlib import Path
-
-from google.adk.agents import Agent, LlmAgent
+from google.adk.agents import Agent
 from google.adk.agents.readonly_context import ReadonlyContext
 
 from cami.config import MODEL_GEMINI_2_0_FLASH

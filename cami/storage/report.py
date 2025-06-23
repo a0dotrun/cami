@@ -1,9 +1,9 @@
 discharge_report_template: dict[str, dict] = {
-    "patient_name": {
+    "hospital_name": {
         "value": "",
         "required": True,
-        "description": "The patient's full legal name, including first and last name.",
-        "example": "John Doe",
+        "description": "The name of the hospital the Patient was addmitted to.",
+        "example": "Penn State Medical College",
     },
     "address": {
         "value": "",
@@ -11,17 +11,17 @@ discharge_report_template: dict[str, dict] = {
         "description": "The patient's complete mailing address.",
         "example": "123 Main Street, Any town, ST 12345",
     },
-    "phone_number": {
+    "age": {
         "value": "",
         "required": True,
-        "description": "The patient's primary contact phone number, including the country code. Default country code is IND +91",
-        "example": "+1-555-123-4567",
+        "description": "The Patient's age in years.",
+        "example": "32 years",
     },
-    "date_of_birth": {
+    "hospitalization_days": {
         "value": "",
         "required": True,
-        "description": "The patient's date of birth in YYYY-MM-DD format.",
-        "example": "1990-06-15",
+        "description": "The total number of days the Patient was admitted.",
+        "example": "3 days",
     },
     "gender": {
         "value": "",
@@ -44,7 +44,7 @@ discharge_report_template: dict[str, dict] = {
     "department": {
         "value": "",
         "required": False,
-        "description": "The specific hospital department the patient was admitted to.",
+        "description": "(Optional) The specific hospital department the patient was admitted to.",
         "example": "Cardiology",
     },
 }

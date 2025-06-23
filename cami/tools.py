@@ -335,10 +335,10 @@ class FieldTemplate(BaseModel):
 
 
 class DischargeReportTemplate(BaseModel):
-    patient_name: FieldTemplate
+    hospital_name: FieldTemplate
     address: FieldTemplate
-    phone_number: FieldTemplate
-    date_of_birth: FieldTemplate
+    age: FieldTemplate
+    hospitalization_days: FieldTemplate
     gender: FieldTemplate
     method_of_admission: FieldTemplate
     reason_for_hospitalization: FieldTemplate

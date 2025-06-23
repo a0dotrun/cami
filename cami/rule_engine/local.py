@@ -15,6 +15,7 @@ def bill_report_agent_instructions(context: ReadonlyContext) -> str:
     If the customer asks anything else, transfer back to the triage agent.
     """
 
+
 BILL_REPORT_INSTRUCTION = """
     You are a helpful policy expert. You will take bill items from the user and use the appropriate tools to verify the claim. Pass the response from the tool unchanged
 """
@@ -24,5 +25,5 @@ bill_report_agent = LlmAgent(
     description="You are a helpful policy expert. You will take bill items from the user and use `rule_engine_tool` tool to verify the claim",
     instruction=bill_report_agent_instructions,
     model="gemini-2.0-flash",
-    tools=[bill_report_tool]
+    tools=[bill_report_tool],
 )
