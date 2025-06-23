@@ -64,8 +64,8 @@ class PolicyPlan(BaseModel):
 
 def policies_in_db() -> list[PolicyPlan]:
     policies = [
-        PolicyPlan(name="Star Health Pro", policy_id="SHS1234", sum_insured=100000),
-        PolicyPlan(name="Star Health Lite", policy_id="SHL7760", sum_insured=20000),
+        PolicyPlan(name="Cami Lite", policy_id="CAMI2025-Lite", sum_insured=500000),
+        PolicyPlan(name="Cami Pro", policy_id="CAMI2025-Pro", sum_insured=1000000),
     ]
     return policies
 

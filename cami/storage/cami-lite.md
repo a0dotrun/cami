@@ -1,6 +1,6 @@
 # Sample Health Insurance Policy: "Cami Lite"
 
-**Policy ID:** CAMI2025-A1
+**Policy ID:** CAMI2025-Lite
 **Effective Date:** 01/06/2025
 
 ## 1. Policy Overview
@@ -9,21 +9,7 @@
 
 ---
 
-## 2. Policy Holder Details
-
-- **Name:** Kireeti
-- **Age:** 32
-- **Sum Insured:** ₹5,00,000
-
----
-
-## 3. Claim Details
-
-- **Total Claim Amount:** {total_claim_amount}
-- **Hospitalisation Days:** {hospitalisation_days}
----
-
-## 3. Key Inclusions (Covered Treatments & Expenses):\*\*
+## 2. Key Inclusions (Covered Treatments & Expenses):\*\*
 
 - **In-Patient Hospitalization:**
   - Details: `Expenses incurred for medical treatment requiring a hospital stay of 24 consecutive hours or more.`
@@ -48,7 +34,7 @@
 
 ---
 
-## 4. Exclusions (What is NOT Covered):\*\*
+## 3. Exclusions (What is NOT Covered):\*\*
 
 - **Waiting Periods:** `Any illness/injury occurring during the Initial Waiting Period, Pre-Existing Disease (PED) Waiting Period, or Specific Disease/Procedure Waiting Period (as defined in the policy schedule).`
 - **Non-Medical Consumables:** `Charges for non-medical consumables such as gloves, syringes, hand sanitizers, cotton, and other items typically listed as "non-payable" by the insurer (e.g., as per IRDAI guidelines).`
@@ -72,7 +58,7 @@
 
 ---
 
-## 5. Sublimits (Specific Caps on Coverage):\*\*
+## 4. Sublimits (Specific Caps on Coverage):\*\*
 
 - **Room Rent:**
   - Type: `daily_limit`
