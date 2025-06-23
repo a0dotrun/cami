@@ -13,9 +13,9 @@
   },
   {
     "id": 3,
-    "name": "Fortis Hospital (Bannerghatta Road)",
-    "address": "154/9, Bannerghatta Road, Opposite IIM-B",
-    "location": "Bangalore, 560076"
+    "name": "Motherhood Hospital (Indiranagar)",
+    "address": "324, 9th Main, 5th Block, HMT Layout, Vidyaranyapura",
+    "location": "Bangalore, 560097"
   },
   {
     "id": 4,
@@ -107,12 +107,7 @@
     "address": "1533, 9th Main, 3rd Block, Jayanagar",
     "location": "Bangalore, 560011"
   },
-  {
-    "id": 19,
-    "name": "Motherhood Hospital (Indiranagar)",
-    "address": "324, 9th Main, 5th Block, HMT Layout, Vidyaranyapura",
-    "location": "Bangalore, 560097"
-  },
+
   {
     "id": 20,
     "name": "Kidwai Memorial Institute of Oncology",
