@@ -11,14 +11,11 @@ def formatter_agent_instructions(context: ReadonlyContext) -> str:
         You are a Markdown table formatter. Your task is to convert the provided array of items into a well-formatted Markdown table.
         The table must include a header row derived from the keys of the items, and each item should be a row in the table.
         Ensure all values are presented clearly.
-        Your output should be *only* the Markdown table, with no additional text, explanations, or code block delimiters (e.g., ```).
-
-        You are an insurance agent to review the claim for individual bill items and determine their eligibility.
-        Use the Review as the algorithm to review the claims
-
         <Input>
             {rule_engine_output}
         </Input>
+        
+        Your output should be *only* the Markdown table, with no additional text, explanations, or code block delimiters (e.g., ```).
     """
 
     print(f"Markdown instruction of approvals: {instruction}")

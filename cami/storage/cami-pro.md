@@ -116,12 +116,10 @@
 
 ## 5. Co-payment:
 
--   **Details:** `A minimal co-payment is applicable on each admissible claim amount for Cami Pro policyholders, based on the age of the insured member and whether treatment is availed at a network or non-network hospital.`
 -   **Co-payment Structure by Age and Hospital Type:**
     -   **Network Hospital:**
         -   `Up to 70 years:` **0%** co-payment
         -   `71 years and above:` **5%** co-payment
     -   **Non-Network Hospital:**
         -   `All ages:` **10%** co-payment
--   **Additive Nature:** `In instances where multiple co-payment conditions apply to a single claim (e.g., age-based co-payment and co-payment for treatment at a non-network hospital), **the applicable co-payment percentages will be added together**. The agent is responsible for summing all applicable co-payments.`
 -   **Application:** `The policyholder will bear the total calculated co-payment percentage of the approved claim amount, and the insurer will pay the remaining balance.`

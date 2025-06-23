@@ -5,11 +5,14 @@ from cami.tools import list_bill_items_as_data
 
 from .formatter_agent import output_formatter_agent
 from .rule_engine_agent import rule_engine_agent
+from .db_utils import get_info
 
 
-def correct_approvals(bill_items):
+async def correct_approvals(patient_id, bill_items):
     print("Correcting Approvals")
-    sum_insured = 500000
+
+    info = await get_info(patient_id=patient_id)
+    sum_insured = info.get("sum_insured", 0)
     for item in bill_items:
         print(f"Item: {item}")
         if item["is_eligible"]:
@@ -47,7 +50,7 @@ async def verify_claim_tool(patient_id: str, tool_context: ToolContext) -> str:
     print("Result from rule_engine_agent_tool ", result)
     bill_items = result["bill_items"]
 
-    bill_items = correct_approvals(bill_items)
+    bill_items = await correct_approvals(patient_id, bill_items)
     tool_context.state["claim:rule_engine_output"] = bill_items
     output_formatter_agent_tool = AgentTool(agent=output_formatter_agent)
     result = await output_formatter_agent_tool.run_async(
