@@ -2,7 +2,6 @@ from google.adk.tools.agent_tool import AgentTool
 from google.adk.tools.tool_context import ToolContext
 
 from cami.tools import list_bill_items_as_data
-
 from .formatter_agent import output_formatter_agent
 from .rule_engine_agent import rule_engine_agent
 
@@ -23,7 +22,7 @@ def correct_approvals(bill_items):
     return bill_items
 
 
-async def bill_report_tool(patient_id: str, tool_context: ToolContext) -> str:
+async def verify_claim_tool(patient_id: str, tool_context: ToolContext) -> str:
     """Verify the bill items claim against the policy document.
 
     Args:
