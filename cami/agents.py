@@ -1,7 +1,8 @@
 from typing import Any
 
 from google.adk.agents import Agent
-from google.adk.tools.agent_tool import AgentTool
+
+# from google.adk.tools.agent_tool import AgentTool
 from google.adk.tools.base_tool import BaseTool
 from google.adk.tools.tool_context import ToolContext
 from pydantic import BaseModel
@@ -13,7 +14,8 @@ from cami.prompts import (
     discharge_agent_instructions,
     policy_agent_instructions,
 )
-from cami.rule_engine.tools import process_claim_agent
+
+# from cami.rule_engine.tools import process_claim_agent
 from cami.tools import (
     add_bill_item,
     available_policies,
@@ -68,7 +70,12 @@ claim_agent = Agent(
     model=MODEL_GEMINI_2_0_FLASH,
     sub_agents=[discharge_agent, bill_agent],
     instruction=claim_agent_instructions,
-    tools=[check_ongoing_claim, start_claim, AgentTool(process_claim_agent)],
+    # @kireeti-kuragayala will add your tools here. for now removing old process_claim_agent
+    tools=[
+        check_ongoing_claim,
+        start_claim,
+        #    AgentTool(process_claim_agent),
+    ],
 )
 
 
