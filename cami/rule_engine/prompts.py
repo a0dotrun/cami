@@ -48,10 +48,14 @@ async def prcess_claim_instructions(context: ReadonlyContext) -> str:
 
             1.  **Eligibility Assessment**: For every bill item, first determine its **eligibility**.
             2.  **Mark Eligibility**: If a bill item is eligible, add a boolean field named `is_eligible` and set its value to `true`.
-            3.  **Calculate Approved Amount**: Compute the `approved_amount` for the eligible bill item by deducting it from the available `sum_insured`.
-            4.  **Sum Insured Exhaustion**: If the `sum_insured` has already been **exhausted** (i.e., it's 0 or less), then the `approved_amount` for the current bill item must be `0`.
-            5.  **Partial Approval**: If the `sum_insured` is less than the calculated approvable amount for the current bill item, then the `approved_amount` should be set **equal to the remaining `sum_insured`**.
-            6.  **Rent Processing**: Specifically for bill items categorized as **Rents**, if the claim is eligible, approve the amount based on the **per daily limit** for each day claimed.
+            3.  **Calculate Initial Approvable Amount**:
+                * **For Rents (e.g., Room Rent, ICU Charges)**: If the bill item is categorized as "Rents," calculate the initial approvable amount based on the **per daily limit** for each day claimed.
+                * **For All Other Items**: For all other bill items, the initial approvable amount is the `claimed_amount`.
+            4.  **Apply Sum Insured Cap**:
+                * Compare the `initial approvable amount` (calculated in step 3) with the currently available `sum_insured`.
+                * The `approved_amount` for the current bill item must be the **minimum** of these two values: `initial approvable amount` and `sum_insured`.
+            5.  **Handle Exhausted Sum Insured**: If, after processing previous items, the `sum_insured` has already been **exhausted** (i.e., it's 0 or less), then the `approved_amount` for the current bill item must be `0`. This check should implicitly cover step 4, ensuring no approval if no sum insured remains.
+            6.  **Update Sum Insured**: After determining the `approved_amount` for the current bill item, **deduct this `approved_amount` from the `sum_insured`** for subsequent bill items. This ensures the `sum_insured` accurately reflects the remaining balance.
         </RuleEngine>
 
         <BillItems>
@@ -70,7 +74,6 @@ async def prcess_claim_instructions(context: ReadonlyContext) -> str:
             - `name`
             - `claimed_amount`
             - `approved_amount`
-            - `is_eligible`
             - `reason`
 
             Your entire response must be **pure JSON**, starting with `[` and ending with `]`. Do not include any additional text, explanations, or Markdown code block delimiters (e.g., ` ```json` or ` ``` `).
