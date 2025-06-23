@@ -2,21 +2,20 @@ import secrets
 from datetime import UTC, datetime
 from typing import Literal
 
-from google.cloud import firestore
 import firebase_admin
+import ulid
 from firebase_admin import firestore_async
 from google.adk.agents import Agent
 from google.adk.agents.readonly_context import ReadonlyContext
 from google.adk.tools import ToolContext
 from google.adk.tools.agent_tool import AgentTool
+from google.cloud import firestore
 from pydantic import BaseModel, Field
 
 from cami.config import MODEL_GEMINI_2_0_FLASH, firebase_credentials
 from cami.storage.policies import get_doc_from_policy
 from cami.storage.report import discharge_report_template
 from cami.utils.logger import logger
-import ulid
-
 
 firebase_admin.initialize_app(firebase_credentials)
 
@@ -795,10 +794,50 @@ async def list_bill_items(patient_id: str) -> dict:
         }
 
     except Exception as e:
-        logger.exception("Error fetching bill items")
+        logger.exception("Error fetching bill items", e)
         return {
             "status": "error",
-            "error_message": str(e) or "Error fetching bill items.",
+            "error_message": "Error fetching bill items.",
+        }
+
+
+async def list_bill_items_as_data(patient_id: str) -> dict:
+    """List all bill items for a patient.
+
+    Args:
+        patient_id (str): Patient's ID
+
+    Returns:
+        dict: A dictionary with:
+            - status: 'success' or 'error'
+            - result: list of bill items (if any)
+            - error_message: if error occurred
+    """
+    logger.info(f"Fetching bill items for patient: {patient_id}")
+
+    try:
+        claim_ref = db.collection("claims").document(patient_id)
+        doc = await claim_ref.get()
+
+        if not doc.exists:
+            return {
+                "status": "error",
+                "error_message": f"No claim found for patient ID: {patient_id}",
+            }
+
+        data = doc.to_dict() or {}
+        claim = Claim(**data)
+
+        return {
+            "status": "success",
+            "result": claim.bill_line_items,
+        }
+
+    except Exception as e:
+        logger.exception("Error fetching bill items", e)
+        return {
+            "status": "error",
+            "error_message": "Error fetching bill items.",
         }
 
 
@@ -849,7 +888,7 @@ def update_bill_report_item(patient_id: str, id: str, name: str, charges: str) -
         }
 
     except Exception as e:
-        logger.exception("Error updating bill item")
+        logger.exception("Error updating bill item", e)
         return {
             "status": "error",
             "error_message": "Error updateing billl item. Please try again.",

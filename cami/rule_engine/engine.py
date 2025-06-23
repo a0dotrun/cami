@@ -1,31 +1,29 @@
+# class RuleEngine:
+#     def __init__(self, bill_items):
+#         self.bill_items = bill_items
 
+#     def process(self):
+#         # Todo: Implement deductible and co-pay
 
-class RuleEngine:
-    def __init__(self, bill_items):
-        self.bill_items = bill_items
+#         print("-------- RuleEngine --------")
+#         print(f"Bill Items: {type(self.bill_items)} - ", self.bill_items)
+#         # Since we do not have history of claims, let us assume no claims
+#         # remaining_sum = self.claim.patient.policy.sum_insured
+#         remaining_sum = 500000  # Todo: Change this to get from patient details
 
-    def process(self):
-        # Todo: Implement deductible and co-pay
+#         for bill_item in self.bill_items:
+#             if not bill_item["eligible"]:
+#                 approved_amount = 0
+#             else:
+#                 claim_amount = bill_item["amount"]
 
-        print("-------- RuleEngine --------")
-        print(f"Bill Items: {type(self.bill_items)} - ", self.bill_items)
-        # Since we do not have history of claims, let us assume no claims
-        # remaining_sum = self.claim.patient.policy.sum_insured
-        remaining_sum = 500000  # Todo: Change this to get from patient details
+#                 if claim_amount <= remaining_sum:
+#                     approved_amount = claim_amount
+#                     remaining_sum -= claim_amount
+#                 else:
+#                     approved_amount = remaining_sum
+#                     remaining_sum = 0
 
-        for bill_item in self.bill_items:
-            if not bill_item["eligible"]:
-                approved_amount = 0
-            else:
-                claim_amount = bill_item["amount"]
+#             bill_item["approved_amount"] = approved_amount
 
-                if claim_amount <= remaining_sum:
-                    approved_amount = claim_amount
-                    remaining_sum -= claim_amount
-                else:
-                    approved_amount = remaining_sum
-                    remaining_sum = 0
-
-            bill_item["approved_amount"] = approved_amount
-
-        return self.bill_items
+#         return self.bill_items

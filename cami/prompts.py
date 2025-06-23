@@ -37,6 +37,10 @@ def claim_agent_instructions(context: ReadonlyContext) -> str:
     4. Do not proceed ahead unless you have an ongoing claim or a new claim started.
     5. Ask customer if they would like to start the claim process, If yes then:
         - start by checking discharge report status, transfer to discharge agent to complete the report.
+        - start by checking the bill report status, transfer to bill agent to complete the report.
+    6. Verify that all the pending reports are completed.
+    7. Ask the customer if they would like to start the claim process, use the tool process_claim_agent
+    8. Display the results in a friendly way.
 
     If the customer asks anything else, transfer back to the triage agent.
     """
