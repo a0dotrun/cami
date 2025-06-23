@@ -1,6 +1,6 @@
 # Sample Health Insurance Policy: "Cami Lite"
 
-**Policy ID:** CAMI2025-A1
+**Policy ID:** CAMI2025-Lite
 **Effective Date:** 01/06/2025
 
 ## 1. Policy Overview

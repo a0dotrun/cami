@@ -48,7 +48,7 @@ async def get_instructions(context: ReadonlyContext) -> str:
     patient_id = context.state.get("user:patient_id")
     info = await get_info(patient_id)
 
-    policy_doc_path = Path.cwd() / "cami/storage/policy-lite.md"
+    policy_doc_path = Path.cwd() / "cami/storage/cami-lite.md"
     print(f"Policy Path: {policy_doc_path}")
 
     instruction = f"""
