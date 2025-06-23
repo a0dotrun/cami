@@ -1,7 +1,7 @@
 from google.adk.tools.agent_tool import AgentTool
 from google.adk.tools.tool_context import ToolContext
 
-from cami.tools import list_bill_items_as_data
+from cami.tools import BillLineItemField, list_bill_items_as_data
 
 from .db_utils import get_info
 from .formatter_agent import output_formatter_agent
@@ -35,28 +35,39 @@ async def verify_claim_tool(patient_id: str, tool_context: ToolContext) -> str:
     Returns:
         str: Markdown formatted bill items report for user review
     """
+
+    def format_bills(items: list[BillLineItemField]) -> str:
+        d = {}
+        for i in items:
+            d["name"] = i.name
+            d["charges"] = i.charges
+            d["id"] = i.id
+        return d
+
     response = await list_bill_items_as_data(patient_id=patient_id)
     print("Response from list_bill_items_as_data ", response)
     if response.get("status") != "success":
         return "Error fetching bill items report"
 
-    bill_items = response["result"]
-    tool_context.state["claim:bill_items"] = bill_items
+    bill_items: list[BillLineItemField] = response["result"]
+    bill_items_dict = format_bills(bill_items)
+
+    tool_context.state["claim:bill_items"] = bill_items_dict
     rule_engine_agent_tool = AgentTool(agent=rule_engine_agent)
-    result = await rule_engine_agent_tool.run_async(
+    bill_items_verified = await rule_engine_agent_tool.run_async(
         args={"request": "claims from user"},
         tool_context=tool_context,
     )
-    print("Result from rule_engine_agent_tool ", result)
-    bill_items = result["bill_items"]
+    print("Result from rule_engine_agent_tool ", bill_items_verified)
+    bill_items = bill_items_verified["bill_items"]
 
     bill_items = await correct_approvals(patient_id, bill_items)
     tool_context.state["claim:rule_engine_output"] = bill_items
     output_formatter_agent_tool = AgentTool(agent=output_formatter_agent)
-    result = await output_formatter_agent_tool.run_async(
+    bill_items_verified = await output_formatter_agent_tool.run_async(
         args={
             "request": "Format the input json to markdown table, output markdown table only and avoid extra text and explanations"
         },
         tool_context=tool_context,
     )
-    return result
+    return bill_items_verified

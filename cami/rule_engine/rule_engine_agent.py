@@ -103,7 +103,7 @@ class BillItems(BaseModel):
 
 rule_engine_agent = Agent(
     name="rule_engine_agent",
-    description="A helpful insurance agent, that verifies the claim for individual bill items and determine their eligibility.",
+    description="A helpful agent, that verifies the claim for individual bill items and determine their eligibility.",
     model=MODEL_GEMINI_2_0_FLASH,
     instruction=get_instructions,
     output_schema=BillItems,
