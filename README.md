@@ -1,6 +1,6 @@
 # CAMI
 
-A FastAPI-based application with background task processing using Dramatiq.
+Insurance Claim Assistant AI powered by Google ADK, built for Google ADK Hackathon Project.
 
 ## Installation
 
@@ -18,19 +18,17 @@ uv install --dev
 
 ## Running the Application
 
-### Start the FastAPI Server
+Start the application:
 
 ```bash
-python bin/run.py
+python main.py
 ```
 
-The server will be available at `http://localhost:8000`.
+The server will be available at `http://localhost:8080`.
 
-### Start Background Workers
+## Architecture
 
-```bash
-python -m dramatiq --threads 1 --process 1 cami.workers.background
-```
+For detailed architecture overview, see [Architecture Documentation](assets/Cami-Architecture-Overview.pdf).
 
 ## Development
 
@@ -66,14 +64,12 @@ uv run pytest --cov=cami
 ## Dependencies
 
 - **FastAPI**: Web framework
-- **Dramatiq**: Background task processing
 - **Firebase Admin**: Firebase integration
 - **PostgreSQL**: Database (psycopg2-binary)
-- **Redis**: Caching and message broker
 - **Pydantic**: Data validation
 
 ## Development Tools
 
 - **Ruff**: Linting and formatting
-- **MyPy**: Type checking
+- **Pyrefry**: Type checking
 - **Pytest**: Testing framework
