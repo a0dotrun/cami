@@ -22,8 +22,10 @@ async def check_membership(user_id: str) -> dict:
     logger.info(f"Checking membership for user {user_id}")
     user = await db_utils.get_user(user_id)
     if user is None:
+        logger.error(f"User {user_id} not found")
         return error("Membership does not exists")
 
+    logger.info(f"user found: {user.to_dict()}")
     return success(user.to_dict())
 
 

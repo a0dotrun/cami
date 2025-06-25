@@ -3,6 +3,7 @@ import asyncio
 from policy.db import *
 from policy.policy import *
 from cami.user_policy import *
+from cami.user.db import get_user
 
 
 async def main():
@@ -11,14 +12,18 @@ async def main():
     #     'full_name': 'Alan Turing'
     # })
 
-    patient_id = "PID-183747"
+    # patient_id = "PID-183747"
     # user_policy = UserPolicy(
     #     patient_id=patient_id,
     #     policy_id=CamiLitePolicy.id
     # )
     # await db.collection("policies").document(patient_id).set(user_policy.to_dict())
 
-    ref = db.collection("policies").document(patient_id)
+    # ref = db.collection("policies").document(patient_id)
+    # doc = await ref.get()
+    # print(doc.to_dict())
+
+    ref = db.collection("users").document("alan_turing")
     doc = await ref.get()
     print(doc.to_dict())
 

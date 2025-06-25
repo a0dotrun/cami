@@ -3,12 +3,15 @@ from typing import Any
 from google.adk.tools.base_tool import BaseTool
 from google.adk.tools.tool_context import ToolContext
 
+from cami.utils import logger
 from .schema import MembershipResponse
 
 
 def on_after_membership_tool(
     tool: BaseTool, args: dict[str, Any], tool_context: ToolContext, tool_response: dict
 ) -> None | dict:
+
+    logger.info(f"Inside on_after_membership_tool hook, toolResponse: {tool_response}")
     if not tool_response:
         return None
 
