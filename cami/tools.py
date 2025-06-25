@@ -56,18 +56,7 @@ db = firestore_async.client()
 #         return self.name
 
 
-class PolicyPlan(BaseModel):
-    name: str
-    policy_id: str
-    sum_insured: int
 
-
-def policies_in_db() -> list[PolicyPlan]:
-    policies = [
-        PolicyPlan(name="Cami Lite", policy_id="CAMI2025-Lite", sum_insured=500000),
-        PolicyPlan(name="Cami Pro", policy_id="CAMI2025-Pro", sum_insured=1000000),
-    ]
-    return policies
 
 
 async def check_membership(patient_id: str) -> dict:
@@ -168,114 +157,6 @@ async def create_membership(first_name: str, last_name: str, phone_number: str, 
             "error_message": "Failed to create membership",
         }
 
-
-def available_policies() -> dict:
-    """List available policies for purchase.
-
-    Returns:
-        dict: A dictionary containing keys:
-            - status: 'success' or 'error'.
-            - error_message: present only if error occurred.
-            - result: if successful list of policies for purchase.
-    """
-    logger.info("Listing available policies for purchase")
-    policies = policies_in_db()
-    items: list[str] = []
-    for policy in policies:
-        i = f"""\n
-        - Name: {policy.name}\n - Policy ID: {policy.policy_id}\n - Sum Assured: {policy.sum_insured}\n\n"""
-        items.append(i)
-    items_str = "".join(items)
-    return {
-        "status": "success",
-        "result": f"""Policies:
-        {items_str}
-        """,
-    }
-
-
-async def purchase_policy(patient_id: str, policy_id: str) -> dict:
-    """Create a new policy for the patient with the selected policy plan.
-
-    Args:
-        patient_id (str): Patient's ID
-        policy_id (str): Selected policy ID by the Patient
-
-    Returns:
-        dict: A dictionary containing keys:
-            - status: 'success' or 'error'.
-            - error_message: present only if error occurred.
-            - result: if successful with purchased policy details.
-    """
-    logger.info(f"Purchasing policy {policy_id} for patient {patient_id}")
-    try:
-        policies = policies_in_db()
-        selected_policy = next((p for p in policies if p.policy_id == policy_id), None)
-        if selected_policy is None:
-            return {
-                "status": "error",
-                "error_message": "The selected Policy does not exist or expired. Please select another policy.",
-            }
-        policy_ref = db.collection("policies").document(patient_id)
-        await policy_ref.set(
-            {
-                "policy_id": selected_policy.policy_id,
-                "name": selected_policy.name,
-                "date_of_purchase": datetime.now(),
-            }
-        )
-        return {
-            "status": "success",
-            "result": f"Successfully purchased policy {selected_policy.name} having policy ID {selected_policy.policy_id}",
-        }
-
-    except Exception as e:
-        logger.error(f"Error purchasing policy plan: {e!s}")
-        return {
-            "status": "error",
-            "error_message": "Error purchasing policy. Please try again.",
-        }
-
-
-async def check_existing_policy(patient_id: str) -> dict:
-    """Check existing policy for the Patient.
-
-    Args:
-        patient_id (str): Patient's ID
-
-    Returns:
-        dict: A dictionary containing keys:
-            - status: 'success' or 'error'.
-            - error_message: present only if error occurred.
-            - result: if successful with purchased policy details.
-    """
-    logger.info(f"Checking existing policy for patient {patient_id}")
-    try:
-        policy_ref = db.collection("policies").document(patient_id)
-        policy_doc = await policy_ref.get()
-        if not policy_doc.exists:
-            return {
-                "status": "error",
-                "error_message": "No existing policy found for the patient. Please purchase a new policy.",
-            }
-
-        selected_policy = policy_doc.to_dict()
-        if selected_policy is None:
-            return {
-                "status": "error",
-                "error_message": "No existing policy found for the patient. Please purchase a new policy.",
-            }
-        return {
-            "status": "success",
-            "result": f"Found existing policy {selected_policy.get('name')} having policy ID {selected_policy.get('policy_id')}",
-        }
-
-    except Exception as e:
-        logger.error(f"Error checking existing policy: {e!s}")
-        return {
-            "status": "error",
-            "error_message": "Error checking existing policy. Please try again.",
-        }
 
 
 def policy_faq_instructions(context: ReadonlyContext) -> str:
