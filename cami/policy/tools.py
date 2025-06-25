@@ -1,4 +1,4 @@
-import db as policy_db_utils
+from . import db as policy_db_utils
 from .policy import get_policy_by_id
 from .patient_policy import PatientPolicy
 from cami.utils import logger, tool_error_handler, error, success

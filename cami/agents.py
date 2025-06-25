@@ -7,25 +7,17 @@ from pydantic import BaseModel
 
 from cami.config import MODEL_GEMINI_2_0_FLASH
 from cami.prompts import (
-    TRIAGE_INSTRUCTION,
     claim_agent_instructions,
     discharge_agent_instructions,
-    policy_agent_instructions,
 )
 from cami.rule_engine.tools import process_claim
 from cami.tools import (
     add_bill_item,
-    available_policies,
     bill_report_status,
-    check_existing_policy,
-    check_membership,
     check_ongoing_claim,
-    create_membership,
     discharge_report_form,
     discharge_report_status,
     list_bill_items,
-    policy_faqs,
-    purchase_policy,
     start_claim,
     update_bill_report_item,
     update_bill_report_status,

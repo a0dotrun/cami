@@ -12,51 +12,11 @@ from google.adk.tools.agent_tool import AgentTool
 from google.cloud import firestore
 from pydantic import BaseModel, Field
 
-from cami.config import MODEL_GEMINI_2_0_FLASH, firebase_credentials
+from cami.infra.firebase import db
+from cami.config import MODEL_GEMINI_2_0_FLASH
 from cami.storage.policies import get_doc_from_policy
 from cami.storage.report import discharge_report_template
 from cami.utils.logger import logger
-
-firebase_admin.initialize_app(firebase_credentials)
-
-
-db = firestore_async.client()
-
-
-# class AskForApproval:
-#     """
-#     Request approval for a reimbursement from the designated approver.
-
-#     Args:
-#         amount (float): The amount requested.
-#         purpose (str): The reason for the reimbursement.
-
-#     Returns:
-#         A dictionary containing the approval status and metadata:
-#             status (str): The current status (e.g., "pending").
-#             approver (str): The name of the approver handling the request.
-#             message (str): A human-readable message about the request status.
-#     """
-
-#     name = "ask_for_approval"
-
-#     def __init__(self):
-#         pass
-
-#     async def __call__(self, amount: float, purpose: str) -> dict[str, Any]:
-#         print("-> [In Tool] args:", amount, purpose)
-#         return {
-#             "status": "pending",
-#             "approver": "Sean Zhou",
-#             "message": "Your request is being processed. Please wait.",
-#         }
-
-#     @property
-#     def __name__(self):
-#         return self.name
-
-
-
 
 
 async def check_membership(patient_id: str) -> dict:
@@ -156,7 +116,6 @@ async def create_membership(first_name: str, last_name: str, phone_number: str, 
             "status": "error",
             "error_message": "Failed to create membership",
         }
-
 
 
 def policy_faq_instructions(context: ReadonlyContext) -> str:

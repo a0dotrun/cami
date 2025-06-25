@@ -1,4 +1,4 @@
-from cami.agents import triage_agent
+from cami.root_agent import triage_agent
 
 root_agent = triage_agent
 
