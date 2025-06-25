@@ -30,4 +30,3 @@ def on_after_membership_tool(
             "result": format_result(response),
         }
     return None
-

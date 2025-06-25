@@ -2,7 +2,7 @@ import asyncio
 
 from policy.db import *
 from policy.policy import *
-from policy.patient_policy import *
+from cami.user_policy import *
 
 
 async def main():
@@ -12,12 +12,11 @@ async def main():
     # })
 
     patient_id = "PID-183747"
-    # patient_policy = PatientPolicy(
+    # user_policy = UserPolicy(
     #     patient_id=patient_id,
-    #     policy_id=CamiLitePolicy.id,
-    #     date_of_purchase=datetime.datetime.now(),
+    #     policy_id=CamiLitePolicy.id
     # )
-    # await db.collection("policies").document(patient_id).set(patient_policy.to_dict())
+    # await db.collection("policies").document(patient_id).set(user_policy.to_dict())
 
     ref = db.collection("policies").document(patient_id)
     doc = await ref.get()
