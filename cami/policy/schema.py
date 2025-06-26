@@ -1,7 +1,7 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 
 class MembershipResponse(BaseModel):
-    patient_id: str
+    user_id: str = Field(validation_alias="id")
     first_name: str
     last_name: str

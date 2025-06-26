@@ -16,7 +16,7 @@ def on_after_membership_tool(
         return None
 
     def format_result(result: MembershipResponse) -> str:
-        return f"""Patient ID: {result.patient_id}\n
+        return f"""User ID: {result.user_id}\n
         First Name: {result.first_name}\n
         Last Name: {result.last_name}\n
         """
@@ -26,8 +26,8 @@ def on_after_membership_tool(
     if tool_name in ("check_membership", "create_membership") and result_status == "success":
         result: dict = tool_response.get("result", {})
         response = MembershipResponse(**result)
-        # set the patient_id in the tool context state
-        tool_context.state["user:patient_id"] = response.patient_id
+        # set the user_id in the tool context state
+        tool_context.state["user:user_id"] = response.user_id
         return {
             "status": result_status,
             "result": format_result(response),
