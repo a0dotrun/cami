@@ -6,9 +6,9 @@ from . import db as db_utils
 from .user import User
 
 
-@tool_error_handler("Failed to check membership")
+@tool_error_handler("Encountered error while checking membership")
 async def check_membership(user_id: str) -> dict:
-    """Check membership for the given yser_id.
+    """Check membership for the given user_id.
 
     Args:
         user_id (str): The unique identifier for the patient.
