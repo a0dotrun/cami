@@ -1,10 +1,7 @@
-import secrets
 from datetime import UTC, datetime
 from typing import Literal
 
-import firebase_admin
 import ulid
-from firebase_admin import firestore_async
 from google.adk.agents import Agent
 from google.adk.agents.readonly_context import ReadonlyContext
 from google.adk.tools import ToolContext
